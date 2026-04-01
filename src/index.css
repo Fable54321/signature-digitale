@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root {
+  --font-primary: 'Roboto Slab', serif;
+  --font-secondary: 'Open Sans', sans-serif;
+}
+
+@theme {
+  --color-primary: #96c61c;
+  --color-secondary: #4b7312;
+  --color-tertiary: #F6F9F3;
+  --font-primary: var(--font-primary);
+  --font-secondary: var(--font-secondary);
+
+}
+
+.custom-input {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: var(--color-secondary);
+  border-radius: 0.125rem;
+  /* rounded-sm */
+}
+
+.custom-input:focus {
+  outline-width: 2px;
+  outline-color: var(--color-primary);
+}
+
+
+
+
+.button-generic {
+  background-color: #4b7312;
+
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  direction: ltr;
+  font-family: 'Roboto Slab', sans-serif;
+
+  font-weight: bold;
+  letter-spacing: -.022em;
+  line-height: 1.47059;
+  box-shadow: -2px 4px 6px hsl(0deg 0% 0% / 0.2);
+  overflow: visible;
+  padding-inline: 0.5rem;
+  padding-block: 0.25rem;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+}
+
+.button-generic-red {
+  background-color: hsl(0, 100%, 45%);
+
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  direction: ltr;
+  font-family: "Roboto Slab", sans-serif;
+
+  font-weight: bold;
+  letter-spacing: -.022em;
+  line-height: 1.47059;
+  box-shadow: -2px 4px 6px hsl(0deg 0% 0% / 0.2);
+  overflow: visible;
+  padding-inline: 0.5rem;
+  padding-block: 0.25rem;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+}
+
+.button-generic:disabled {
+  cursor: default;
+  opacity: .3;
+}
+
+.button-generic:hover {
+  background-color: hsl(85, 73%, 36%);
+  text-decoration: none;
+}
+
+.button-generic:active {
+  background-image: linear-gradient(hsl(85, 73%, 56%), hsl(85, 73%, 26%));
+  transform: scaleX(.98) scaleY(.98);
+  outline: none;
+}
+
+.button-generic:focus {
+
+  outline: none;
+}
+
+.button-generic-red:hover {
+  background-color: hsl(0, 100%, 55%);
+  text-decoration: none;
+}
+
+
+
+/* 
+/* *   Kevin Powell
+*   https://youtu.be/cCAtD_BAHNw 
+*/
+
+
+html,
+body,
+#root {
+  min-height: 100vh;
+  background-color: #F6F9F3;
+}
