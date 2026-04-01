@@ -4,6 +4,7 @@ import './index.css'
 import App from '../src/App/000--App/App'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ForeignWorkerProvider } from './Contexts/ForeignWorkerContext'
+import ContractPage from './App/100--ContractPage/ContractPage'
 
 
 const router = createBrowserRouter([
@@ -11,7 +12,12 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
   
+  },
+  {
+    path: '/contrat',
+    element: <ContractPage />,
   }
+
 ])
 
 

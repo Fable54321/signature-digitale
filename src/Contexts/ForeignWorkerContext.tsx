@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -32,9 +33,13 @@ type ForeignWorkerContextType = {
   setPin: React.Dispatch<React.SetStateAction<string>>;
   worker: Worker | null;
   loading: boolean;
+  pdfLoading: boolean;
   error: string;
+  pdfUrl: string | null;
   lookupByPin: (pinToLookup?: string) => Promise<boolean>;
+  generateContractPdf: (pinToUse?: string) => Promise<boolean>;
   clearWorker: () => void;
+  clearPdf: () => void;
 };
 
 const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>(
@@ -42,8 +47,6 @@ const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>
 );
 
 const baseUrl = import.meta.env.VITE_API_URL;
-
-
 
 export const ForeignWorkerProvider = ({
   children,
@@ -53,13 +56,25 @@ export const ForeignWorkerProvider = ({
   const [pin, setPin] = useState("");
   const [worker, setWorker] = useState<Worker | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  const clearPdf = useCallback(() => {
+    setPdfUrl((prev) => {
+      if (prev) {
+        URL.revokeObjectURL(prev);
+      }
+      return null;
+    });
+  }, []);
 
   const clearWorker = useCallback(() => {
     setWorker(null);
     setError("");
     setPin("");
-  }, []);
+    clearPdf();
+  }, [clearPdf]);
 
   const lookupByPin = useCallback(
     async (pinToLookup?: string) => {
@@ -76,9 +91,12 @@ export const ForeignWorkerProvider = ({
         setError("");
         setWorker(null);
 
-        const res = await axios.post(`${baseUrl}/signature/foreign-worker-info/by-pin`, {
-          pin: finalPin,
-        });
+        const res = await axios.post(
+          `${baseUrl}/signature/foreign-worker-info/by-pin`,
+          {
+            pin: finalPin,
+          }
+        );
 
         setWorker(res.data.worker);
         return true;
@@ -97,17 +115,86 @@ export const ForeignWorkerProvider = ({
     [pin]
   );
 
+  const generateContractPdf = useCallback(
+    async (pinToUse?: string) => {
+      const finalPin = pinToUse ?? pin;
+
+      if (!finalPin) {
+        setError("Veuillez entrer votre PIN");
+        return false;
+      }
+
+      try {
+        setPdfLoading(true);
+        setError("");
+
+        setPdfUrl((prev) => {
+          if (prev) {
+            URL.revokeObjectURL(prev);
+          }
+          return null;
+        });
+
+        const res = await axios.post(
+          `${baseUrl}/signature/foreign-worker-contract/by-pin`,
+          {
+            pin: finalPin,
+          },
+          {
+            responseType: "blob",
+          }
+        );
+
+        const blob = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+
+        setPdfUrl(url);
+        return true;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        setError("Erreur lors de la génération du PDF");
+        return false;
+      } finally {
+        setPdfLoading(false);
+      }
+    },
+    [pin]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfUrl]);
+
   const value = useMemo(
     () => ({
       pin,
       setPin,
       worker,
       loading,
+      pdfLoading,
       error,
+      pdfUrl,
       lookupByPin,
+      generateContractPdf,
       clearWorker,
+      clearPdf,
     }),
-    [pin, worker, loading, error, lookupByPin, clearWorker]
+    [
+      pin,
+      worker,
+      loading,
+      pdfLoading,
+      error,
+      pdfUrl,
+      lookupByPin,
+      generateContractPdf,
+      clearWorker,
+      clearPdf,
+    ]
   );
 
   return (
@@ -129,5 +216,3 @@ export const useForeignWorker = () => {
 
   return context;
 };
-
-
