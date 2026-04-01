@@ -1,25 +1,25 @@
+import { useEffect } from "react";
 import { useForeignWorker } from "../../Contexts/ForeignWorkerContext";
 
 const ContractPage = () => {
   const {
-    pin,
-    setPin,
     worker,
     error,
-    loading,
-    pdfLoading,
     pdfUrl,
-    lookupByPin,
     generateContractPdf,
   } = useForeignWorker();
 
-  const handleLookup = async () => {
-    await lookupByPin();
-  };
+ 
 
-  const handleGeneratePdf = async () => {
-    await generateContractPdf();
-  };
+useEffect(() => {
+  if (!worker) return;
+
+  generateContractPdf(worker.pin.toString());
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [worker]);
+
+     
+  
 
   return (
     <article className="flex flex-col items-center w-full">
@@ -28,33 +28,7 @@ const ContractPage = () => {
           Contrat travailleur
         </h2>
 
-        <div className="flex flex-col gap-3 max-w-sm">
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={5}
-            value={pin}
-            onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-            placeholder="Entrer le PIN"
-            className="border-2 border-secondary rounded-md p-2"
-          />
-
-          <button
-            onClick={handleLookup}
-            disabled={loading}
-            className="rounded-md bg-secondary text-white py-2 font-bold disabled:opacity-50"
-          >
-            {loading ? "Vérification..." : "Vérifier le PIN"}
-          </button>
-
-          <button
-            onClick={handleGeneratePdf}
-            disabled={pdfLoading}
-            className="rounded-md bg-secondary text-white py-2 font-bold disabled:opacity-50"
-          >
-            {pdfLoading ? "Génération..." : "Afficher le PDF"}
-          </button>
-        </div>
+        
 
         {error && <p className="text-red-600">{error}</p>}
 

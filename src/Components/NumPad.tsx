@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Delete } from "lucide-react"
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
+import { useNavigate } from "react-router-dom";
 
 
 const NumPad = () => {
 
 const [currentPin, setCurrentPin] = useState<number[]>([]);
 
-const { lookupByPin, worker } = useForeignWorker();
+const { lookupByPin, worker, clearWorker } = useForeignWorker();
+
+const navigate = useNavigate();
 
 
 
@@ -32,9 +35,16 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 }
 
 useEffect(() => {
-  console.log(worker);
-}, [worker]);
+  clearWorker();
+// eslint-disable-next-line react-hooks/exhaustive-deps
+},[]);
 
+useEffect(() => {
+  if(worker) {
+    navigate("/contrat");
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+},[worker]);
 
 
 const formattedPin = useMemo(() => {
