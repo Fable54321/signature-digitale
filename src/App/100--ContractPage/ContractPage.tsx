@@ -17,6 +17,7 @@ const ContractPage = () => {
 useEffect(() => {
   getCurrentWorker();
   
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [])
 
 
@@ -25,6 +26,7 @@ useEffect(() => {
 
   setPin(worker?.pin.toString() || "");
   generateContractPdf(pin);
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [worker]);
 
 
