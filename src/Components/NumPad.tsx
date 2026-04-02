@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Delete } from "lucide-react"
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,11 @@ const NumPad = () => {
 
 const [currentPin, setCurrentPin] = useState<number[]>([]);
 
-const { lookupByPin, worker, clearWorker } = useForeignWorker();
+const { lookupByPin, pin, setPin, getCurrentWorker } = useForeignWorker();
 
 const navigate = useNavigate();
+
+
 
 
 
@@ -30,26 +32,30 @@ const handleAddNumber = (NumEntered: number) => () => {
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
-    lookupByPin(formattedPin.toString());
-    setCurrentPin([]);
+    lookupByPin(pin);
+    getCurrentWorker();
+
+    navigate("/contrat");
+    
 }
 
-useEffect(() => {
-  clearWorker();
-// eslint-disable-next-line react-hooks/exhaustive-deps
-},[]);
+
+
+
+
+
+
+
+
+// const formattedPin = useMemo(() => {
+//   return Number(currentPin.join(''));
+// }, [currentPin]);
+
 
 useEffect(() => {
-  if(worker) {
-    navigate("/contrat");
-  }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-},[worker]);
-
-
-const formattedPin = useMemo(() => {
-  return Number(currentPin.join(''));
-}, [currentPin]);
+  const formattedPin = currentPin.join('');
+  setPin(formattedPin);
+}, [currentPin, setPin]);
 
 
 

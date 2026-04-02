@@ -26,6 +26,7 @@ type Worker = {
   approximative_daily_hours: number;
   approximative_weekly_hours: number;
   pin: number;
+  is_connected: boolean;
 };
 
 type ForeignWorkerContextType = {
@@ -40,6 +41,8 @@ type ForeignWorkerContextType = {
   generateContractPdf: (pinToUse?: string) => Promise<boolean>;
   clearWorker: () => void;
   clearPdf: () => void;
+  disconnect: () => void;
+  getCurrentWorker: () => Promise<boolean>;
 };
 
 const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>(
@@ -76,36 +79,52 @@ export const ForeignWorkerProvider = ({
     clearPdf();
   }, [clearPdf]);
 
+  const disconnect = useCallback((pinToUse?: string) => {
+
+    pinToUse = pinToUse ?? pin;
+
+    clearWorker();
+    setPin("");
+
+    axios.post(`${baseUrl}/signature/foreign-worker-info/disconnect`,
+      {
+        pin: pinToUse,
+      }
+    )
+
+    .catch((err) => {
+      console.error("Error during disconnect:", err);
+    });
+
+    
+  }, [clearWorker, pin]);
+
   const lookupByPin = useCallback(
     async (pinToLookup?: string) => {
       const finalPin = pinToLookup ?? pin;
 
       if (!finalPin) {
         setError("Veuillez entrer votre PIN");
-        setWorker(null);
         return false;
       }
 
       try {
         setLoading(true);
         setError("");
-        setWorker(null);
 
-        const res = await axios.post(
+        await axios.post(
           `${baseUrl}/signature/foreign-worker-info/by-pin`,
           {
             pin: finalPin,
           }
         );
 
-        setWorker(res.data.worker);
         return true;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        setWorker(null);
         setError(
           err.response?.data?.error ||
-            "Erreur lors de la récupération des informations"
+            "Erreur lors de la connexion"
         );
         return false;
       } finally {
@@ -114,6 +133,34 @@ export const ForeignWorkerProvider = ({
     },
     [pin]
   );
+
+
+  const getCurrentWorker = useCallback((async () => {
+    try {
+      setLoading(true);
+      setError("");
+      setWorker(null);
+
+      const res = await axios.get(
+        `${baseUrl}/signature/foreign-worker-info/current`,
+      );
+
+      setWorker(res.data.worker);
+      return true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setWorker(null);
+      setError(
+        err.response?.data?.error ||
+          "Erreur lors de la récupération des informations"
+      );
+      return false;
+    } finally {
+      setLoading(false);
+    }
+
+
+  }), [])
 
   const generateContractPdf = useCallback(
     async (pinToUse?: string) => {
@@ -182,6 +229,8 @@ export const ForeignWorkerProvider = ({
       generateContractPdf,
       clearWorker,
       clearPdf,
+      disconnect,
+      getCurrentWorker,
     }),
     [
       pin,
@@ -194,6 +243,8 @@ export const ForeignWorkerProvider = ({
       generateContractPdf,
       clearWorker,
       clearPdf,
+      disconnect,
+      getCurrentWorker,
     ]
   );
 

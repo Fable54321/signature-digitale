@@ -7,16 +7,35 @@ const ContractPage = () => {
     error,
     pdfUrl,
     generateContractPdf,
+    pin,
+    setPin,
+    disconnect,
+    getCurrentWorker,
   } = useForeignWorker();
 
- 
 
 useEffect(() => {
-  if (!worker) return;
+  getCurrentWorker();
+  
+}, [])
 
-  generateContractPdf(worker.pin.toString());
-// eslint-disable-next-line react-hooks/exhaustive-deps
+
+useEffect(() => {
+  if(!worker) return;
+
+  setPin(worker?.pin.toString() || "");
+  generateContractPdf(pin);
 }, [worker]);
+
+
+
+useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker])
+
+
+
+
+
+
 
      
   
@@ -54,8 +73,12 @@ useEffect(() => {
           />
         )}
       </div>
-    </article>
-  );
-};
+
+
+
+        <button onClick={() => disconnect()} className="button-generic-red mt-10">Déconnexion</button>
+      </article>
+    );
+  };
 
 export default ContractPage;
