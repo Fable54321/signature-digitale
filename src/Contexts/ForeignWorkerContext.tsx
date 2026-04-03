@@ -38,7 +38,7 @@ type ForeignWorkerContextType = {
   error: string;
   pdfUrl: string | null;
   lookupByPin: (pinToLookup?: string) => Promise<boolean>;
-  generateContractPdf: (pinToUse?: string) => Promise<boolean>;
+  generateContractPdf: (pinToUse?: string, contractSlug?: string) => Promise<boolean>;
   clearWorker: () => void;
   clearPdf: () => void;
   disconnect: () => void;
@@ -163,7 +163,7 @@ export const ForeignWorkerProvider = ({
   }), [])
 
   const generateContractPdf = useCallback(
-    async (pinToUse?: string) => {
+    async (pinToUse?: string, contractSlug?: string) => {
       const finalPin = pinToUse ?? pin;
 
       if (!finalPin) {
@@ -186,6 +186,7 @@ export const ForeignWorkerProvider = ({
           `${baseUrl}/signature/foreign-worker-contract/by-pin`,
           {
             pin: finalPin,
+            contractSlug: contractSlug,
           },
           {
             responseType: "blob",

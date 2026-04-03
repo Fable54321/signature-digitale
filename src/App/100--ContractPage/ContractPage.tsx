@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForeignWorker } from "../../Contexts/ForeignWorkerContext";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const ContractPage = () => {
   const {
@@ -14,6 +15,16 @@ const ContractPage = () => {
   } = useForeignWorker();
 
 
+  const [contract, setContract] = useState<number>(2);
+
+ 
+
+
+  const contracts: Record<number, string> = {
+    1: "PTAS",
+    2: "PTET",
+  }
+
 useEffect(() => {
   getCurrentWorker();
   
@@ -25,9 +36,9 @@ useEffect(() => {
   if(!worker) return;
 
   setPin(worker?.pin.toString() || "");
-  generateContractPdf(pin);
+  generateContractPdf(pin, contracts[contract]);
 // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [worker]);
+}, [worker, contract]);
 
 
 
@@ -76,9 +87,15 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
         )}
       </div>
 
+        <div className="flex flex-col gap-2 items-center mt-10">
+        <div className="flex flex-row gap-2">
+          <button className="button-generic" onClick={() => setContract(contract === 1 ? 2 : 1)} ><ChevronLeft /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 2 ? 1 : 2)}><ChevronRight /></button>
+        </div>
+          <button onClick={() => disconnect()} className="button-generic-red ">Déconnexion</button>
 
+        </div>
 
-        <button onClick={() => disconnect()} className="button-generic-red mt-10">Déconnexion</button>
       </article>
     );
   };
