@@ -5,11 +5,13 @@ import {
   useEffect,
   useMemo,
   useState,
+  
   type ReactNode,
 } from "react";
+
 import axios from "axios";
 
-type Worker = {
+export type Worker = {
   user_id: number;
   username: string;
   name: string;
@@ -51,6 +53,8 @@ const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
+
+
 export const ForeignWorkerProvider = ({
   children,
 }: {
@@ -62,6 +66,8 @@ export const ForeignWorkerProvider = ({
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+
 
   const clearPdf = useCallback(() => {
     setPdfUrl((prev) => {
@@ -95,6 +101,8 @@ export const ForeignWorkerProvider = ({
     .catch((err) => {
       console.error("Error during disconnect:", err);
     });
+
+    location.replace("/");
 
     
   }, [clearWorker, pin]);

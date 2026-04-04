@@ -3,6 +3,7 @@
 :root {
   --font-primary: 'Roboto Slab', serif;
   --font-secondary: 'Open Sans', sans-serif;
+  --font-tertiary: 'Inter', sans-serif;
 }
 
 @theme {
@@ -11,7 +12,7 @@
   --color-tertiary: #F6F9F3;
   --font-primary: var(--font-primary);
   --font-secondary: var(--font-secondary);
-
+  --font-tertiary: var(--font-tertiary);
 }
 
 .custom-input {
@@ -104,6 +105,30 @@
   text-decoration: none;
 }
 
+
+.button-generic-light {
+  background-color: #96c61c;
+
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  direction: ltr;
+  font-family: 'Roboto Slab', sans-serif;
+
+  font-weight: bold;
+  letter-spacing: -.022em;
+  line-height: 1.47059;
+ 
+  overflow: visible;
+  padding-inline: 0.75rem;
+  padding-block: 0.5rem;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+}
 
 
 /* 

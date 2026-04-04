@@ -10,7 +10,6 @@ function App() {
       <div className='mt-05'>
         <img src={vegibecLogo} alt="Vegibec Logo" className='w-70 sm:w-80 ' />
       </div>
-      <h1 className='font-primary font-bold text-[1.8em]'>Appli de signature digitale</h1>
       <NumPad />
     </article>
   )

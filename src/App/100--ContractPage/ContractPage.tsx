@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForeignWorker } from "../../Contexts/ForeignWorkerContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import IdentityConfirmation from "../../Components/IdentityConfirmation";
 
 const ContractPage = () => {
   const {
@@ -16,6 +17,8 @@ const ContractPage = () => {
 
 
   const [contract, setContract] = useState<number>(2);
+
+  const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
 
  
 
@@ -54,7 +57,10 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
   
 
   return (
-    <article className="flex flex-col items-center w-full">
+
+<>
+   {  (
+    <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
       <div className="w-[90%] max-w-5xl mt-10 flex flex-col gap-6">
         <h2 className="text-[1.8em] font-primary text-center">
           Contrat travailleur
@@ -97,7 +103,11 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
         </div>
 
       </article>
-    );
+    )}
+    
+    {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} />}
+   </> 
+   );
   };
 
 export default ContractPage;
