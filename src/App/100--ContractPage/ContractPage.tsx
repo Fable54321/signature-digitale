@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import IdentityConfirmation from "../../Components/IdentityConfirmation";
 import Spinner from "../../Components/Spinner";
 import { Document, Page, pdfjs } from "react-pdf";
+import SignatureBlock from "../../Components/SignatureBlock";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -24,7 +25,7 @@ const ContractPage = () => {
   } = useForeignWorker();
 
 
-  const [contract, setContract] = useState<number>(2);
+  const [contract, setContract] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(0);
 
   const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
@@ -85,6 +86,9 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
       </div>
       )}
 
+       {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />}
+   
+
    { !isLoading &&  (
     <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
       <div className="w-[90%] max-w-5xl mt-10 flex flex-col gap-6">
@@ -112,8 +116,12 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
           </div>
         )}
 
+        
+
  
       </div>
+
+      <SignatureBlock />
 
         <div className="flex flex-col gap-2 items-center mt-10">
         <div className="flex flex-row gap-2">
@@ -124,10 +132,11 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
 
         </div>
 
+        
+
       </article>
     )}
     
-    {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />}
    </> 
    );
   };
