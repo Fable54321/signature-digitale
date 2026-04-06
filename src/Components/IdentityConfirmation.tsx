@@ -1,21 +1,36 @@
 import type { Worker } from "../Contexts/ForeignWorkerContext";
 import { ShieldCheck, UserRound, CalendarDays } from "lucide-react";
+import "./CSS/IdentityConfirmation.css";
+
 
 type IdentityConfirmationProps = {
     worker: Worker;
     setIsIdentityConfirmed: (confirmed: boolean) => void;
+    loading: boolean;
+    disconnect: (pinToUse?: string) => void;
 
 }
 
-const IdentityConfirmation = ({ worker, setIsIdentityConfirmed }: IdentityConfirmationProps) => {
+const IdentityConfirmation = ({ worker, setIsIdentityConfirmed, disconnect }: IdentityConfirmationProps) => {
+
+
+
+
   return (
-    <section className="flex flex-col items-center absolute z-10 top-1/4 left-1/2 -translate-x-1/2 bg-white rounded-3xl border-secondary shadow-2xl w-[min(98%,580px)] ">
+
+
+
+    (
+
+
+
+    <section className="slide-in flex flex-col items-center absolute z-10 top-1/7 left-1/2 -translate-x-1/2 bg-white rounded-3xl border-secondary shadow-2xl w-[min(98%,580px)] ">
      <div className="relative flex justify-center items-center w-20 h-20 rounded-full bg-tertiary shadow-xl mt-8">
       <ShieldCheck className="text-primary  " size={64} />
      </div>
     <form className="  flex flex-col items-center gap-5 py-4 px-8">
        
-      <p className=" font-primary font-bold text-[2.5em] text-center">¿Esto datos son correctos?</p>
+      <p className=" font-primary font-bold text-[2.5em] text-center text-secondary">¿Esto datos son correctos?</p>
         <ul className="flex flex-col  w-full mt-4">
             <li className="text-[1.5em]">
   <div className="flex items-center justify-between text-secondary bg-blue-50 border border-gray-200 py-6 px-5 rounded-tl-md rounded-tr-md">
@@ -58,11 +73,17 @@ const IdentityConfirmation = ({ worker, setIsIdentityConfirmed }: IdentityConfir
     </span>
   </div>
 </li>
-        </ul>    
-      <button className=" mb-2 w-full button-generic-light text-[2em] shadow-2xl " type="button" onClick={() => setIsIdentityConfirmed(true)}>Confirmo los datos</button>
+        </ul>
+       <div className="flex flex-col w-full">     
+      <button className=" mb-2 w-full button-generic-light  text-[2em] shadow-2xl " type="button" onClick={() => setIsIdentityConfirmed(true)}>Confirmo los datos</button>
+      <button className=" mb-2 w-full button-generic-light-red  text-[2em] shadow-2xl " type="button" onClick={() => {
+        disconnect();
+      }}>Corregir pin</button>
+      </div>
     </form>
     </section>
   )
+)
 }
 
 export default IdentityConfirmation

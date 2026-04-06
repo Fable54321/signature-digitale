@@ -1,27 +1,46 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForeignWorker } from "../../Contexts/ForeignWorkerContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import IdentityConfirmation from "../../Components/IdentityConfirmation";
+import Spinner from "../../Components/Spinner";
+import { Document, Page, pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 const ContractPage = () => {
   const {
     worker,
-    error,
     pdfUrl,
     generateContractPdf,
     pin,
     setPin,
     disconnect,
     getCurrentWorker,
+    loading,
+    pdfLoading,
   } = useForeignWorker();
 
 
   const [contract, setContract] = useState<number>(2);
+  const [numPages, setNumPages] = useState<number>(0);
 
   const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
 
+
+    const onLoadSuccess = useCallback(
+    ({ numPages }: { numPages: number }) => {
+      setNumPages(numPages);
+    },
+    []
+  );
+
  
 
+ 
+const isLoading = useMemo(() => loading || pdfLoading, [loading, pdfLoading]);
 
   const contracts: Record<number, string> = {
     1: "PTAS",
@@ -59,38 +78,41 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
   return (
 
 <>
-   {  (
+
+    {isLoading && (
+      <div className="flex flex-col items-center justify-center h-60">
+      <Spinner />
+      </div>
+      )}
+
+   { !isLoading &&  (
     <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
       <div className="w-[90%] max-w-5xl mt-10 flex flex-col gap-6">
         <h2 className="text-[1.8em] font-primary text-center">
-          Contrat travailleur
+          Contrato de trabajo
         </h2>
 
-        
+      
 
-        {error && <p className="text-red-600">{error}</p>}
-
-        {worker && (
-          <div className="rounded-md border p-4 bg-white">
-            <p>
-              <strong>Nom :</strong> {worker.surname} {worker.name}
-            </p>
-            <p>
-              <strong>Poste :</strong> {worker.job_title}
-            </p>
-            <p>
-              <strong>Pays :</strong> {worker.residence_country}
-            </p>
+        {!isLoading && pdfUrl && (
+         <div className="flex justify-center">
+           <Document file={pdfUrl} onLoadSuccess={onLoadSuccess}>
+              {Array.from({ length: numPages }, (_, index) => (
+          <div
+            key={index}
+            className="bg-white shadow-md rounded-md overflow-hidden"
+          >
+            <Page pageNumber={index + 1}
+             width={900}
+             renderTextLayer={false}
+             renderAnnotationLayer={false} />
+          </div>
+        ))}
+      </Document>
           </div>
         )}
 
-        {pdfUrl && (
-          <iframe
-            src={pdfUrl}
-            title="Contrat PDF"
-            className="w-full h-225 border rounded-md bg-white"
-          />
-        )}
+ 
       </div>
 
         <div className="flex flex-col gap-2 items-center mt-10">
@@ -105,7 +127,7 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
       </article>
     )}
     
-    {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} />}
+    {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />}
    </> 
    );
   };

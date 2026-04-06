@@ -47,6 +47,8 @@ type ForeignWorkerContextType = {
   getCurrentWorker: () => Promise<boolean>;
 };
 
+
+
 const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>(
   undefined
 );
@@ -70,12 +72,7 @@ export const ForeignWorkerProvider = ({
 
 
   const clearPdf = useCallback(() => {
-    setPdfUrl((prev) => {
-      if (prev) {
-        URL.revokeObjectURL(prev);
-      }
-      return null;
-    });
+    setPdfUrl(null);
   }, []);
 
   const clearWorker = useCallback(() => {
@@ -85,27 +82,36 @@ export const ForeignWorkerProvider = ({
     clearPdf();
   }, [clearPdf]);
 
-  const disconnect = useCallback((pinToUse?: string) => {
+const disconnect = useCallback(
+  async (pinToUse?: string) => {
+    const finalPin = pinToUse ?? pin;
 
-    pinToUse = pinToUse ?? pin;
+    if (!finalPin) {
+      setError("Veuillez entrer votre PIN");
+      return false;
+    }
 
-    clearWorker();
-    setPin("");
+    try {
+      setLoading(true);
 
-    axios.post(`${baseUrl}/signature/foreign-worker-info/disconnect`,
-      {
-        pin: pinToUse,
-      }
-    )
+      await axios.post(`${baseUrl}/signature/foreign-worker-info/disconnect`, {
+        pin: finalPin,
+      });
 
-    .catch((err) => {
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => resolve(null))
+      );
+
+      location.replace("/");
+      return true;
+    } catch (err) {
       console.error("Error during disconnect:", err);
-    });
-
-    location.replace("/");
-
-    
-  }, [clearWorker, pin]);
+      setLoading(false);
+      return false;
+    }
+  },
+  [pin]
+);
 
   const lookupByPin = useCallback(
     async (pinToLookup?: string) => {
@@ -141,6 +147,14 @@ export const ForeignWorkerProvider = ({
     },
     [pin]
   );
+
+  useEffect(() => {
+  return () => {
+    if (pdfUrl) {
+      URL.revokeObjectURL(pdfUrl);
+    }
+  };
+}, [pdfUrl]);
 
 
   const getCurrentWorker = useCallback((async () => {
@@ -183,12 +197,7 @@ export const ForeignWorkerProvider = ({
         setPdfLoading(true);
         setError("");
 
-        setPdfUrl((prev) => {
-          if (prev) {
-            URL.revokeObjectURL(prev);
-          }
-          return null;
-        });
+       
 
         const res = await axios.post(
           `${baseUrl}/signature/foreign-worker-contract/by-pin`,
@@ -199,12 +208,16 @@ export const ForeignWorkerProvider = ({
           {
             responseType: "blob",
           }
+          
         );
 
         const blob = new Blob([res.data], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
-
         setPdfUrl(url);
+
+        
+
+        
         return true;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
       } catch (err: any) {
@@ -217,13 +230,7 @@ export const ForeignWorkerProvider = ({
     [pin]
   );
 
-  useEffect(() => {
-    return () => {
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl);
-      }
-    };
-  }, [pdfUrl]);
+ 
 
   const value = useMemo(
     () => ({
