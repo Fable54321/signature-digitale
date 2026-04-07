@@ -17,13 +17,16 @@ const SignatureBlock = () => {
 
 
   return (
-    <>
-    <div className='bg-white border-2 border-black mt-2'>
+    <section className='flex flex-col gap-2'>
+    <div className='bg-white border-2 border-black mt-4'>
        <SignatureCanvas ref={sigCanvas} penColor='green'
     canvasProps={{width: 800, height: 120, className: 'sigCanvas'}} />
     </div>
-    <button onClick={clear} className='button-generic-red'>Effacer</button>
-    </>
+    <div className='flex w-full justify-center gap-2'>
+      <button className='button-generic  text-[1.5em] flex-1'>Validar</button>
+      <button onClick={clear} className=  ' text-[1.5em] button-generic-red flex-1'>Borrar</button>
+    </div>
+    </section>
   )
 }
 
