@@ -135,7 +135,7 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
 
       </label>
 
-     { acceptedTerms && <SignatureBlock contractId={currentContractId} acceptedTerms={acceptedTerms} signedName={signedName} />}
+     { acceptedTerms && <SignatureBlock contractId={currentContractId} acceptedTerms={acceptedTerms} signedName={signedName} setAcceptedTerms={setAcceptedTerms} />}
 
         <div className="flex flex-col gap-2 items-center mt-10">
         <div className="flex flex-row gap-2">

@@ -5,6 +5,7 @@ import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 type SignatureBlockProps = {
   contractId: number;
   acceptedTerms: boolean;
+  setAcceptedTerms: React.Dispatch<React.SetStateAction<boolean>>;
   signedName: string;
 };
 
@@ -12,6 +13,7 @@ const SignatureBlock = ({
   contractId,
   acceptedTerms,
   signedName,
+  setAcceptedTerms,
 }: SignatureBlockProps) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
 
@@ -41,6 +43,8 @@ const SignatureBlock = ({
       acceptedTerms,
       signedName,
     });
+
+    setAcceptedTerms(false);
   };
 
   return (
