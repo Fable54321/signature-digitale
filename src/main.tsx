@@ -5,6 +5,7 @@ import App from '../src/App/000--App/App'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ForeignWorkerProvider } from './Contexts/ForeignWorkerContext'
 import ContractPage from './App/100--ContractPage/ContractPage'
+import Admin from './App/200--Admin/Admin'
 
 
 const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: '/contrat',
     element: <ContractPage />,
+  },
+  {
+    path: '/admin',
+    element: <Admin />,
   }
 
 ])

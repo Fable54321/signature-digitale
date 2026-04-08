@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForeignWorker } from "../../Contexts/ForeignWorkerContext";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import IdentityConfirmation from "../../Components/IdentityConfirmation";
 import Spinner from "../../Components/Spinner";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -94,6 +94,8 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
 
    { !isLoading &&  (
     <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
+<button onClick={() => disconnect()} className="button-generic-red absolute top-2 right-2 "><LogOut /></button>
+
       <div className="w-[90%] max-w-5xl mt-10 flex flex-col gap-6">
         <h2 className="text-[1.8em] font-primary text-center">
           Contrato de trabajo
@@ -124,9 +126,9 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
  
       </div>
 
-      <label htmlFor="" className="mt-4 text-[1.4em] font-bold flex gap-2  flex-col-reverse items-center">
+      <label htmlFor="" className="mt-4 text-[1.7em] font-bold flex gap-2  flex-col-reverse items-center ">
         <input
-        className="w-12 h-12"
+        className="w-16 h-16 "
           type="checkbox"
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
@@ -142,7 +144,7 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
           <button className="button-generic" onClick={() => setContract(contract === 1 ? 2 : 1)} ><ChevronLeft /></button>
           <button className="button-generic" onClick={() => setContract(contract === 2 ? 1 : 2)}><ChevronRight /></button>
         </div>
-          <button onClick={() => disconnect()} className="button-generic-red ">Déconnexion</button>
+          
 
         </div>
 
