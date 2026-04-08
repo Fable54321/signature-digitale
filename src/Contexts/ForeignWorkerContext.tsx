@@ -5,9 +5,12 @@ import {
   useEffect,
   useMemo,
   useState,
+ 
   
   type ReactNode,
 } from "react";
+
+
 
 import axios from "axios";
 
@@ -31,6 +34,17 @@ export type Worker = {
   is_connected: boolean;
 };
 
+
+type SignContractParams = {
+  contractId: number;
+  signatureDataUrl: string;
+  acceptedTerms: boolean;
+  signedName: string;
+};
+
+type SignContract = (params: SignContractParams) => Promise<boolean>;
+
+
 type ForeignWorkerContextType = {
   pin: string;
   setPin: React.Dispatch<React.SetStateAction<string>>;
@@ -45,6 +59,10 @@ type ForeignWorkerContextType = {
   clearPdf: () => void;
   disconnect: () => void;
   getCurrentWorker: () => Promise<boolean>;
+  currentContractId: number;
+  setCurrentContractId: React.Dispatch<React.SetStateAction<number>>;
+  signContract: SignContract;
+  setError: React.Dispatch<React.SetStateAction<string>>;
 };
 
 
@@ -68,6 +86,8 @@ export const ForeignWorkerProvider = ({
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [currentContractId, setCurrentContractId] = useState<number>(0);
+  
 
 
 
@@ -184,52 +204,117 @@ const disconnect = useCallback(
 
   }), [])
 
-  const generateContractPdf = useCallback(
-    async (pinToUse?: string, contractSlug?: string) => {
-      const finalPin = pinToUse ?? pin;
+const generateContractPdf = useCallback(
+  async (pinToUse?: string, contractSlug?: string) => {
+    const finalPin = pinToUse ?? pin;
 
-      if (!finalPin) {
-        setError("Veuillez entrer votre PIN");
-        return false;
+    if (!finalPin) {
+      setError("Veuillez entrer votre PIN");
+      return false;
+    }
+
+    try {
+      setPdfLoading(true);
+      setError("");
+
+      const createRes = await axios.post(
+        `${baseUrl}/signature/foreign-worker-contract/by-pin`,
+        {
+          pin: finalPin,
+          contractSlug,
+        }
+      );
+
+      const { contractId } = createRes.data;
+
+      if (!contractId) {
+        throw new Error("contractId manquant");
       }
 
-      try {
-        setPdfLoading(true);
-        setError("");
+      const urlRes = await axios.get(
+        `${baseUrl}/signature/foreign-worker-contract/${contractId}/url`
+      );
 
-       
+      const { url } = urlRes.data;
 
-        const res = await axios.post(
-          `${baseUrl}/signature/foreign-worker-contract/by-pin`,
-          {
-            pin: finalPin,
-            contractSlug: contractSlug,
-          },
-          {
-            responseType: "blob",
-          }
-          
-        );
-
-        const blob = new Blob([res.data], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        setPdfUrl(url);
-
-        
-
-        
-        return true;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        setError("Erreur lors de la génération du PDF");
-        return false;
-      } finally {
-        setPdfLoading(false);
+      if (!url) {
+        throw new Error("URL signée manquante");
       }
-    },
-    [pin]
-  );
 
+      setCurrentContractId(contractId);
+      setPdfUrl(url);
+
+      return contractId;
+    } catch (err) {
+      console.error("Erreur lors de la génération/récupération du PDF:", err);
+      setError("Erreur lors de la génération du PDF");
+      return false;
+    } finally {
+      setPdfLoading(false);
+    }
+  },
+  [pin]
+);
+
+
+const signContract = useCallback<SignContract>(
+  async ({
+    contractId,
+    signatureDataUrl,
+    acceptedTerms,
+    signedName,
+  }) => {
+    if (!contractId) {
+      setError("Contrat introuvable");
+      return false;
+    }
+
+    if (!acceptedTerms) {
+      setError("Vous devez accepter le contrat avant de signer");
+      return false;
+    }
+
+    if (!signatureDataUrl) {
+      setError("Veuillez ajouter votre signature");
+      return false;
+    }
+
+    try {
+      setPdfLoading(true);
+      setError("");
+
+      await axios.post(
+        `${baseUrl}/signature/foreign-worker-contract/${contractId}/sign`,
+        {
+          signatureDataUrl,
+          acceptedTerms,
+          signedName,
+        }
+      );
+
+      const urlRes = await axios.get(
+        `${baseUrl}/signature/foreign-worker-contract/${contractId}/url`
+      );
+
+      const { url } = urlRes.data;
+
+      if (!url) {
+        throw new Error("URL signée manquante");
+      }
+
+      setPdfUrl(url);
+
+      return true;
+    } catch (err) {
+      console.error("Erreur lors de la signature du contrat:", err);
+      setError("Erreur lors de la signature du contrat");
+      return false;
+    } finally {
+      setPdfLoading(false);
+    }
+  },
+  []
+);
  
 
   const value = useMemo(
@@ -247,6 +332,10 @@ const disconnect = useCallback(
       clearPdf,
       disconnect,
       getCurrentWorker,
+      currentContractId,
+      setCurrentContractId,
+      signContract,
+      setError,
     }),
     [
       pin,
@@ -261,6 +350,10 @@ const disconnect = useCallback(
       clearPdf,
       disconnect,
       getCurrentWorker,
+      currentContractId,
+      setCurrentContractId,
+      signContract,
+      setError,
     ]
   );
 

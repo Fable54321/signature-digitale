@@ -1,33 +1,82 @@
-import { useRef } from 'react';
-import SignatureCanvas from 'react-signature-canvas'
+import { useRef } from "react";
+import SignatureCanvas from "react-signature-canvas";
+import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 
-const SignatureBlock = () => {
+type SignatureBlockProps = {
+  contractId: number;
+  acceptedTerms: boolean;
+  signedName: string;
+};
 
+const SignatureBlock = ({
+  contractId,
+  acceptedTerms,
+  signedName,
+}: SignatureBlockProps) => {
+  const sigCanvas = useRef<SignatureCanvas | null>(null);
 
-    const sigCanvas = useRef<SignatureCanvas>(null);
+  const { signContract, pdfLoading, setError } = useForeignWorker();
 
-    const clear = () => {
+  const clear = () => {
+    if (!sigCanvas.current) return;
+    sigCanvas.current.clear();
+  };
 
-        if (!sigCanvas.current) {
-            return;
-        }
-
-        sigCanvas.current.clear();
+  const handleValidate = async () => {
+    if (!sigCanvas.current) {
+      setError("Zone de signature introuvable");
+      return;
     }
 
+    if (sigCanvas.current.isEmpty()) {
+      setError("Veuillez ajouter votre signature");
+      return;
+    }
+
+    const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
+
+    await signContract({
+      contractId,
+      signatureDataUrl,
+      acceptedTerms,
+      signedName,
+    });
+  };
 
   return (
-    <section className='flex flex-col gap-2'>
-    <div className='bg-white border-2 border-black mt-4'>
-       <SignatureCanvas ref={sigCanvas} penColor='green'
-    canvasProps={{width: 800, height: 120, className: 'sigCanvas'}} />
-    </div>
-    <div className='flex w-full justify-center gap-2'>
-      <button className='button-generic  text-[1.5em] flex-1'>Validar</button>
-      <button onClick={clear} className=  ' text-[1.5em] button-generic-red flex-1'>Borrar</button>
-    </div>
-    </section>
-  )
-}
+    <section className="flex flex-col gap-2">
+      <div className="bg-white border-2 border-black mt-4">
+        <SignatureCanvas
+          ref={sigCanvas}
+          penColor="black"
+          canvasProps={{
+            width: 800,
+            height: 120,
+            className: "sigCanvas w-full",
+          }}
+        />
+      </div>
 
-export default SignatureBlock
+      <div className="flex w-full justify-center gap-2">
+        <button
+          onClick={handleValidate}
+          disabled={pdfLoading}
+          className="button-generic text-[1.5em] flex-1"
+        >
+          Valider
+        </button>
+
+        <button
+          onClick={clear}
+          type="button"
+          disabled={pdfLoading}
+          className="text-[1.5em] button-generic-red flex-1"
+        >
+          Borrar
+        </button>
+      </div>
+    </section>
+  );
+};
+
+export default SignatureBlock;

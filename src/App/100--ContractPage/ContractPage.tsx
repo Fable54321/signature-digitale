@@ -22,11 +22,14 @@ const ContractPage = () => {
     getCurrentWorker,
     loading,
     pdfLoading,
+    currentContractId
   } = useForeignWorker();
 
 
   const [contract, setContract] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(0);
+  const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
+  const [signedName, ] = useState<string>("");
 
   const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
 
@@ -121,7 +124,18 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
  
       </div>
 
-      <SignatureBlock />
+      <label htmlFor="" className="mt-4 text-[1.4em] font-bold flex gap-2  flex-col-reverse items-center">
+        <input
+        className="w-12 h-12"
+          type="checkbox"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+        />
+        Confirmo que he leído y comprendido la información anterior.
+
+      </label>
+
+     { acceptedTerms && <SignatureBlock contractId={currentContractId} acceptedTerms={acceptedTerms} signedName={signedName} />}
 
         <div className="flex flex-col gap-2 items-center mt-10">
         <div className="flex flex-row gap-2">
