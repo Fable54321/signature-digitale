@@ -26,7 +26,7 @@ const ContractPage = () => {
   } = useForeignWorker();
 
 
-  const [contract, setContract] = useState<number>(8);
+  const [contract, setContract] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(0);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
   const [signedName, ] = useState<string>("");
@@ -55,6 +55,9 @@ const isLoading = useMemo(() => loading || pdfLoading, [loading, pdfLoading]);
     6: "Aut-ded",
     7: "Aut-ret",
     8: "Pol-bris",
+    9: "Pol-harc",
+    10: "Pol-prot",
+    11: "Pol-vio",
   }
 
 useEffect(() => {
@@ -104,8 +107,8 @@ useEffect(() => {
     <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
 
        <div className="flex flex-row gap-2">
-          <button className="button-generic" onClick={() => setContract(contract === 1 ? 7 : contract - 1)} ><ChevronLeft /></button>
-          <button className="button-generic" onClick={() => setContract(contract === 7 ? 1 : contract + 1)}><ChevronRight /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 1 ? 11 : contract - 1)} ><ChevronLeft /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 11 ? 1 : contract + 1)}><ChevronRight /></button>
         </div>
 <button onClick={() => disconnect()} className="button-generic-red absolute top-2 right-2 "><LogOut /></button>
 
@@ -154,8 +157,8 @@ useEffect(() => {
 
         <div className="flex flex-col gap-2 items-center mt-10">
         <div className="flex flex-row gap-2">
-          <button className="button-generic" onClick={() => setContract(contract === 1 ? 8 : contract - 1)} ><ChevronLeft /></button>
-          <button className="button-generic" onClick={() => setContract(contract === 8 ? 1 : contract + 1)}><ChevronRight /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 1 ? 11 : contract - 1)} ><ChevronLeft /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 11 ? 1 : contract + 1)}><ChevronRight /></button>
         </div>
           
 
