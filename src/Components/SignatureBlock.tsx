@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 
@@ -46,6 +46,8 @@ const SignatureBlock = ({
 
     setAcceptedTerms(false);
   };
+
+  useEffect(()=>{console.log("contractId", contractId)},[contractId])
 
   return (
     <section className="flex flex-col gap-2">

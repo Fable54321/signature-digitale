@@ -26,12 +26,12 @@ const ContractPage = () => {
   } = useForeignWorker();
 
 
-  const [contract, setContract] = useState<number>(1);
+  const [contract, setContract] = useState<number>(8);
   const [numPages, setNumPages] = useState<number>(0);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
   const [signedName, ] = useState<string>("");
 
-  const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
+  const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(true);
 
 
     const onLoadSuccess = useCallback(
@@ -49,6 +49,12 @@ const isLoading = useMemo(() => loading || pdfLoading, [loading, pdfLoading]);
   const contracts: Record<number, string> = {
     1: "PTAS",
     2: "PTET",
+    3: "0Au",
+    4: "0Av",
+    5: "0Lo",
+    6: "Aut-ded",
+    7: "Aut-ret",
+    8: "Pol-bris",
   }
 
 useEffect(() => {
@@ -68,7 +74,7 @@ useEffect(() => {
 
 
 
-useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker])
+
 
 
 
@@ -93,7 +99,14 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
    
 
    { !isLoading &&  (
+
+    
     <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
+
+       <div className="flex flex-row gap-2">
+          <button className="button-generic" onClick={() => setContract(contract === 1 ? 7 : contract - 1)} ><ChevronLeft /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 7 ? 1 : contract + 1)}><ChevronRight /></button>
+        </div>
 <button onClick={() => disconnect()} className="button-generic-red absolute top-2 right-2 "><LogOut /></button>
 
       <div className="w-[90%] max-w-5xl mt-10 flex flex-col gap-6">
@@ -141,8 +154,8 @@ useEffect(() => {console.log("worker in ContractPage:", worker?.email);},[worker
 
         <div className="flex flex-col gap-2 items-center mt-10">
         <div className="flex flex-row gap-2">
-          <button className="button-generic" onClick={() => setContract(contract === 1 ? 2 : 1)} ><ChevronLeft /></button>
-          <button className="button-generic" onClick={() => setContract(contract === 2 ? 1 : 2)}><ChevronRight /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 1 ? 8 : contract - 1)} ><ChevronLeft /></button>
+          <button className="button-generic" onClick={() => setContract(contract === 8 ? 1 : contract + 1)}><ChevronRight /></button>
         </div>
           
 
