@@ -1,14 +1,19 @@
-.slide-in {
-  animation: slide-in 0.5s ease-out forwards;
-} 
 
-@keyframes slide-in {
+
+.test {
+  animation: test 3s ease-out infinite;
+}
+
+
+
+
+@keyframes test {
   from {
     opacity: 0;
-    transform: translateY(-500px);
+    
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    
   }
 }

@@ -24,11 +24,11 @@ const IdentityConfirmation = ({ worker, setIsIdentityConfirmed, disconnect }: Id
 
 
 
-    <section className="slide-in flex flex-col items-center absolute z-10 top-1/7 left-1/2 -translate-x-1/2 bg-white rounded-3xl border-secondary shadow-2xl w-[min(98%,580px)] ">
-     <div className="relative flex justify-center items-center w-20 h-20 rounded-full bg-tertiary shadow-xl mt-8">
+    <section className="test flex flex-col items-center absolute z-10 top-1/7 left-1/2 -translate-x-1/2 bg-white rounded-3xl border-secondary shadow-2xl w-[min(98%,580px)] ">
+     <div className="relative  flex justify-center items-center w-20 h-20 rounded-full bg-tertiary shadow-xl mt-8">
       <ShieldCheck className="text-primary  " size={64} />
      </div>
-    <form className="  flex flex-col items-center gap-5 py-4 px-8">
+    <form className="flex flex-col items-center gap-5 py-4 px-8">
        
       <p className=" font-primary font-bold text-[2.5em] text-center text-secondary">¿Esto datos son correctos?</p>
         <ul className="flex flex-col  w-full mt-4">
@@ -81,6 +81,7 @@ const IdentityConfirmation = ({ worker, setIsIdentityConfirmed, disconnect }: Id
       }}>Corregir pin</button>
       </div>
     </form>
+    
     </section>
   )
 )

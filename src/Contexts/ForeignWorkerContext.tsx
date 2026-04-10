@@ -128,6 +128,8 @@ const disconnect = useCallback(
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(null))
       );
+
+      location.replace("/");
      
       return true;
     } catch (err) {
@@ -205,12 +207,7 @@ const disconnect = useCallback(
 
       
 
-      setIsPinError(true);
-
-      setTimeout(() => {
-        setIsPinError(false);
-        location.replace("/");
-      }, 1500);
+      
     
 
 
@@ -267,7 +264,12 @@ const generateContractPdf = useCallback(
     } catch (err) {
       console.error("Erreur lors de la génération/récupération du PDF:", err);
       setError("Erreur lors de la génération du PDF");
-      
+      setIsPinError(true);
+
+      setTimeout(() => {
+        setIsPinError(false);
+        location.replace("/");
+      }, 1500);
        
       return false;
     } finally {

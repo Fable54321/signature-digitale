@@ -8,6 +8,7 @@ import SignatureBlock from "../../Components/SignatureBlock";
 import SignatureSuccess from "../../Components/SignatureSuccess";
 import DoneSigning from "../../Components/DoneSigning";
 import NipError from "../../Components/NipError";
+import "../../Components/CSS/IdentityConfirmation.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -140,13 +141,17 @@ const prevContract = () => {
 
 <>
 
-    {isLoading && (
+    {isLoading && !isPinError && (
       <div className="flex flex-col items-center justify-center h-60">
       <Spinner />
       </div>
       )}
 
-       {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />}
+       {!isIdentityConfirmed && worker && !isPinError &&
+       
+        <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />
+        
+        }
       {isSuccess && <SignatureSuccess />}
       {isDone && <DoneSigning />}
       {isPinError && <NipError />}
