@@ -7,6 +7,8 @@ type SignatureBlockProps = {
   acceptedTerms: boolean;
   setAcceptedTerms: React.Dispatch<React.SetStateAction<boolean>>;
   signedName: string;
+  next: () => void;
+  setIsSuccess: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SignatureBlock = ({
@@ -14,6 +16,8 @@ const SignatureBlock = ({
   acceptedTerms,
   signedName,
   setAcceptedTerms,
+  next,
+  setIsSuccess,
 }: SignatureBlockProps) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
 
@@ -37,14 +41,26 @@ const SignatureBlock = ({
 
     const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
 
-    await signContract({
+   const success = await signContract({
       contractId,
       signatureDataUrl,
       acceptedTerms,
       signedName,
+      
     });
 
-    setAcceptedTerms(false);
+    if (success) {
+      setAcceptedTerms(false);
+      setIsSuccess(true);
+       next();
+      setTimeout(() => {
+        setIsSuccess(false);
+       
+      }, 1100);
+
+
+      
+    }
   };
 
   useEffect(()=>{console.log("contractId", contractId)},[contractId])

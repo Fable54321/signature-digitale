@@ -5,6 +5,9 @@ import IdentityConfirmation from "../../Components/IdentityConfirmation";
 import Spinner from "../../Components/Spinner";
 import { Document, Page, pdfjs } from "react-pdf";
 import SignatureBlock from "../../Components/SignatureBlock";
+import SignatureSuccess from "../../Components/SignatureSuccess";
+import DoneSigning from "../../Components/DoneSigning";
+import NipError from "../../Components/NipError";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -22,16 +25,20 @@ const ContractPage = () => {
     getCurrentWorker,
     loading,
     pdfLoading,
-    currentContractId
+    currentContractId,
+    contract,
+    setContract,
+    isPinError,
   } = useForeignWorker();
 
 
-  const [contract, setContract] = useState<number>(1);
+ 
   const [numPages, setNumPages] = useState<number>(0);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
   const [signedName, ] = useState<string>("");
-
-  const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(true);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isDone, setIsDone] = useState<boolean>(false);
+  const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
 
 
     const onLoadSuccess = useCallback(
@@ -41,12 +48,13 @@ const ContractPage = () => {
     []
   );
 
+
  
 
  
 const isLoading = useMemo(() => loading || pdfLoading, [loading, pdfLoading]);
 
-  const contracts: Record<number, string> = {
+  const contracts: Record<number, string> = useMemo(() => ({
     1: "PTAS",
     2: "PTET",
     3: "0Au",
@@ -58,7 +66,23 @@ const isLoading = useMemo(() => loading || pdfLoading, [loading, pdfLoading]);
     9: "Pol-harc",
     10: "Pol-prot",
     11: "Pol-vio",
-  }
+  }), [])
+
+
+
+const availableContracts = useMemo(() => {
+  if (!worker) return contracts;
+
+  return Object.fromEntries(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    Object.entries(contracts).filter(([_, slug]) => {
+      if (worker.contract_type === "PTAS") return slug !== "PTET";
+      if (worker.contract_type === "PTET") return slug !== "PTAS";
+      return true;
+    })
+  );
+}, [contracts, worker]);
+
 
 useEffect(() => {
   getCurrentWorker();
@@ -71,7 +95,7 @@ useEffect(() => {
   if(!worker) return;
 
   setPin(worker?.pin.toString() || "");
-  generateContractPdf(pin, contracts[contract]);
+  generateContractPdf(pin, availableContracts[contract]);
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [worker, contract]);
 
@@ -79,7 +103,31 @@ useEffect(() => {
 
 
 
+const contractKeys = Object.keys(availableContracts).map(Number);
 
+
+
+const nextContract = () => {
+  if(contract > contractKeys.length)  {
+    setIsDone(true);
+   setIsSuccess(false);
+    setTimeout(() => {
+      setIsDone(false);
+      disconnect();
+    }, 1800);
+
+    return
+  }
+  const index = contractKeys.indexOf(contract);
+  const nextIndex = (index + 1) % contractKeys.length;
+  setContract(contractKeys[nextIndex]);
+};
+
+const prevContract = () => {
+  const index = contractKeys.indexOf(contract);
+  const prevIndex = (index - 1 + contractKeys.length) % contractKeys.length;
+  setContract(contractKeys[prevIndex]);
+};
 
 
 
@@ -99,7 +147,9 @@ useEffect(() => {
       )}
 
        {!isIdentityConfirmed && worker && <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />}
-   
+      {isSuccess && <SignatureSuccess />}
+      {isDone && <DoneSigning />}
+      {isPinError && <NipError />}
 
    { !isLoading &&  (
 
@@ -107,8 +157,8 @@ useEffect(() => {
     <article className={`flex flex-col items-center w-full relative ${!isIdentityConfirmed ? "blur-sm pointer-events-none" : "" }`}>
 
        <div className="flex flex-row gap-2">
-          <button className="button-generic" onClick={() => setContract(contract === 1 ? 11 : contract - 1)} ><ChevronLeft /></button>
-          <button className="button-generic" onClick={() => setContract(contract === 11 ? 1 : contract + 1)}><ChevronRight /></button>
+          <button className="button-generic" onClick={() => prevContract()} ><ChevronLeft /></button>
+          <button className="button-generic" onClick={() => nextContract()}><ChevronRight /></button>
         </div>
 <button onClick={() => disconnect()} className="button-generic-red absolute top-2 right-2 "><LogOut /></button>
 
@@ -153,7 +203,14 @@ useEffect(() => {
 
       </label>
 
-     { acceptedTerms && <SignatureBlock contractId={currentContractId} acceptedTerms={acceptedTerms} signedName={signedName} setAcceptedTerms={setAcceptedTerms} />}
+     { acceptedTerms && 
+     <SignatureBlock 
+     next={nextContract} 
+     contractId={currentContractId} 
+     acceptedTerms={acceptedTerms} 
+     signedName={signedName} 
+     setAcceptedTerms={setAcceptedTerms}
+     setIsSuccess={setIsSuccess} />}
 
         <div className="flex flex-col gap-2 items-center mt-10">
         <div className="flex flex-row gap-2">

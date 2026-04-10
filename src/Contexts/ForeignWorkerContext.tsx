@@ -32,6 +32,7 @@ export type Worker = {
   approximative_weekly_hours: number;
   pin: number;
   is_connected: boolean;
+  contract_type: string;
 };
 
 
@@ -40,6 +41,7 @@ type SignContractParams = {
   signatureDataUrl: string;
   acceptedTerms: boolean;
   signedName: string;
+
 };
 
 type SignContract = (params: SignContractParams) => Promise<boolean>;
@@ -63,6 +65,10 @@ type ForeignWorkerContextType = {
   setCurrentContractId: React.Dispatch<React.SetStateAction<number>>;
   signContract: SignContract;
   setError: React.Dispatch<React.SetStateAction<string>>;
+  contract: number;
+  setContract: React.Dispatch<React.SetStateAction<number>>;
+  isPinError: boolean;
+ 
 };
 
 
@@ -81,14 +87,15 @@ export const ForeignWorkerProvider = ({
   children: ReactNode;
 }) => {
   const [pin, setPin] = useState("");
+  const [isPinError, setIsPinError] = useState(false);
   const [worker, setWorker] = useState<Worker | null>(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [currentContractId, setCurrentContractId] = useState<number>(0);
+  const [contract, setContract] = useState<number>(11);
   
-
 
 
   const clearPdf = useCallback(() => {
@@ -121,8 +128,7 @@ const disconnect = useCallback(
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(null))
       );
-
-      location.replace("/");
+     
       return true;
     } catch (err) {
       console.error("Error during disconnect:", err);
@@ -196,6 +202,19 @@ const disconnect = useCallback(
         err.response?.data?.error ||
           "Erreur lors de la récupération des informations"
       );
+
+      
+
+      setIsPinError(true);
+
+      setTimeout(() => {
+        setIsPinError(false);
+        location.replace("/");
+      }, 1500);
+    
+
+
+      
       return false;
     } finally {
       setLoading(false);
@@ -248,6 +267,8 @@ const generateContractPdf = useCallback(
     } catch (err) {
       console.error("Erreur lors de la génération/récupération du PDF:", err);
       setError("Erreur lors de la génération du PDF");
+      
+       
       return false;
     } finally {
       setPdfLoading(false);
@@ -263,6 +284,7 @@ const signContract = useCallback<SignContract>(
     signatureDataUrl,
     acceptedTerms,
     signedName,
+    
   }) => {
     if (!contractId) {
       setError("Contrat introuvable");
@@ -304,6 +326,8 @@ const signContract = useCallback<SignContract>(
 
       setPdfUrl(url);
 
+       
+
       return true;
     } catch (err) {
       console.error("Erreur lors de la signature du contrat:", err);
@@ -336,6 +360,9 @@ const signContract = useCallback<SignContract>(
       setCurrentContractId,
       signContract,
       setError,
+      contract,
+      setContract,
+      isPinError
     }),
     [
       pin,
@@ -354,6 +381,9 @@ const signContract = useCallback<SignContract>(
       setCurrentContractId,
       signContract,
       setError,
+      contract,
+      setContract,
+      isPinError
     ]
   );
 

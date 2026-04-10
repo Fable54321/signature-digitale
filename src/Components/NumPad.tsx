@@ -4,6 +4,7 @@ import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 import { useNavigate } from "react-router-dom";
 
 
+
 const NumPad = () => {
 
 const [currentPin, setCurrentPin] = useState<number[]>([]);
@@ -21,6 +22,7 @@ const handleAddNumber = (NumEntered: number) => () => {
     
     if (currentPin.length === 5) {
         alert("No puedes introducir más de 5 números");
+        return;
     }
 
 
@@ -62,7 +64,12 @@ useEffect(() => {
 
 
   return (
-    <section className="w-full flex flex-col items-center">
+
+
+    <section className="w-full flex flex-col items-center relative">
+
+
+
       <h2 className="font-medium text-[1.9em]">Introduce tu PIN</h2>
 
       <p className=" flex items-center justify-center border-2 text-[5em] border-gray-400 rounded-lg w-[min(98%,600px)] tracking-widest text-center h-27">{currentPin}</p>
