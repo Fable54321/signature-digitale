@@ -1,7 +1,7 @@
 
 
 .test {
-  animation: test 3s ease-out infinite;
+  animation: test 1200ms ease-out forwards;
 }
 
 
@@ -9,11 +9,11 @@
 
 @keyframes test {
   from {
-    opacity: 0;
+    transform: translateY(-50%);
     
   }
   to {
-    opacity: 1;
+    transform: translateY(0%);
     
   }
 }

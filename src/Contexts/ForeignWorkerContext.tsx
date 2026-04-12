@@ -30,7 +30,7 @@ export type Worker = {
   job_duration: string;
   approximative_daily_hours: number;
   approximative_weekly_hours: number;
-  pin: number;
+  pin: string;
   is_connected: boolean;
   contract_type: string;
 };
@@ -65,8 +65,6 @@ type ForeignWorkerContextType = {
   setCurrentContractId: React.Dispatch<React.SetStateAction<number>>;
   signContract: SignContract;
   setError: React.Dispatch<React.SetStateAction<string>>;
-  contract: number;
-  setContract: React.Dispatch<React.SetStateAction<number>>;
   isPinError: boolean;
  
 };
@@ -94,7 +92,7 @@ export const ForeignWorkerProvider = ({
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [currentContractId, setCurrentContractId] = useState<number>(0);
-  const [contract, setContract] = useState<number>(11);
+ 
   
 
 
@@ -168,6 +166,12 @@ const disconnect = useCallback(
           err.response?.data?.error ||
             "Erreur lors de la connexion"
         );
+
+           setIsPinError(true);
+
+      setTimeout(() => {
+        location.replace("/");
+      }, 1500);
         return false;
       } finally {
         setLoading(false);
@@ -208,7 +212,7 @@ const disconnect = useCallback(
       
 
       
-    
+      
 
 
       
@@ -264,12 +268,7 @@ const generateContractPdf = useCallback(
     } catch (err) {
       console.error("Erreur lors de la génération/récupération du PDF:", err);
       setError("Erreur lors de la génération du PDF");
-      setIsPinError(true);
-
-      setTimeout(() => {
-        setIsPinError(false);
-        location.replace("/");
-      }, 1500);
+   
        
       return false;
     } finally {
@@ -362,8 +361,6 @@ const signContract = useCallback<SignContract>(
       setCurrentContractId,
       signContract,
       setError,
-      contract,
-      setContract,
       isPinError
     }),
     [
@@ -383,8 +380,6 @@ const signContract = useCallback<SignContract>(
       setCurrentContractId,
       signContract,
       setError,
-      contract,
-      setContract,
       isPinError
     ]
   );

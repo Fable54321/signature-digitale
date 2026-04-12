@@ -72,7 +72,7 @@ useEffect(() => {
 
       <h2 className="font-medium text-[1.9em]">Introduce tu PIN</h2>
 
-      <p className=" flex items-center justify-center border-2 text-[5em] border-gray-400 rounded-lg w-[min(98%,600px)] tracking-widest text-center h-27">{currentPin}</p>
+      <p className=" flex items-center bg-white justify-center border-2 text-[5em] border-gray-400 rounded-lg w-[min(98%,600px)] tracking-widest text-center h-27">{currentPin}</p>
 
       <form onSubmit={(e) => handleSubmit(e)} className="w-full flex flex-col items-center gap-2" >
           <div className="grid grid-cols-3 w-[min(98%,600px)] gap-x-2 gap-y-4 mt-4">
