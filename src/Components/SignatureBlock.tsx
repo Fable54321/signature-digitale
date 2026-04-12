@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 
@@ -7,7 +7,6 @@ type SignatureBlockProps = {
   acceptedTerms: boolean;
   setAcceptedTerms: React.Dispatch<React.SetStateAction<boolean>>;
   signedName: string;
-  next: () => void;
   setIsSuccess: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -16,7 +15,6 @@ const SignatureBlock = ({
   acceptedTerms,
   signedName,
   setAcceptedTerms,
-  next,
   setIsSuccess,
 }: SignatureBlockProps) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
@@ -41,29 +39,23 @@ const SignatureBlock = ({
 
     const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
 
-   const success = await signContract({
+    const success = await signContract({
       contractId,
       signatureDataUrl,
       acceptedTerms,
       signedName,
-      
     });
 
     if (success) {
       setAcceptedTerms(false);
       setIsSuccess(true);
-       next();
+      sigCanvas.current.clear();
+
       setTimeout(() => {
         setIsSuccess(false);
-       
       }, 1100);
-
-
-      
     }
   };
-
-  useEffect(()=>{console.log("contractId", contractId)},[contractId])
 
   return (
     <section className="flex flex-col gap-2">

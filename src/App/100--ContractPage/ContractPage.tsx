@@ -6,7 +6,7 @@ import IdentityConfirmation from "../../Components/IdentityConfirmation";
 import Spinner from "../../Components/Spinner";
 import { Document, Page, pdfjs } from "react-pdf";
 import SignatureBlock from "../../Components/SignatureBlock";
-import SignatureSuccess from "../../Components/SignatureSuccess";
+
 import DoneSigning from "../../Components/DoneSigning";
 import NipError from "../../Components/NipError";
 import "../../Components/CSS/IdentityConfirmation.css";
@@ -17,29 +17,29 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 const ContractPage = () => {
-  const {
-    worker,
-    pdfUrl,
-    generateContractPdf,
-    pin,
-    setPin,
-    disconnect,
-    getCurrentWorker,
-    loading,
-    pdfLoading,
-    currentContractId,
-    isPinError,
-  } = useForeignWorker();
+const {
+  worker,
+  pdfUrl,
+  generateContractPdf,
+  setPin,
+  disconnect,
+  getCurrentWorker,
+  loading,
+  pdfLoading,
+  currentContract,
+  contracts,
+  isPinError,
+} = useForeignWorker();
 
 
  
   const [numPages, setNumPages] = useState<number>(0);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
   const [signedName, ] = useState<string>("");
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [, setIsSuccess] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
-   const [contract, setContract] = useState<number>(1);
+
 
 
     const onLoadSuccess = useCallback(
@@ -55,35 +55,28 @@ const ContractPage = () => {
  
 const isLoading = useMemo(() => loading || pdfLoading, [loading, pdfLoading]);
 
-  const contracts: Record<number, string> = useMemo(() => ({
-    1: "PTAS",
-    2: "PTET",
-    3: "0Au",
-    4: "0Av",
-    5: "0Lo",
-    6: "Aut-ded",
-    7: "Aut-ret",
-    8: "Pol-bris",
-    9: "Pol-harc",
-    10: "Pol-prot",
-    11: "Pol-vio",
-  }), [])
+const isAllSigned = useMemo(
+  () => contracts.length > 0 && contracts.every((contract) => contract.status === "signed"),
+  [contracts]
+);
 
+useEffect(() => {
+  if (!isAllSigned) return;
 
+  setIsDone(true);
+  setIsSuccess(false);
 
-const availableContracts = useMemo(() => {
-  if (!worker) return contracts;
+  const timeout = setTimeout(() => {
+    setIsDone(false);
+    void disconnect();
+  }, 1800);
 
-  return Object.fromEntries(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Object.entries(contracts).filter(([_, slug]) => {
-      if (worker.contract_type === "PTAS") return slug !== "PTET";
-      if (worker.contract_type === "PTET") return slug !== "PTAS";
-      return true;
-    })
-  );
-}, [contracts, worker]);
+  return () => clearTimeout(timeout);
+}, [isAllSigned, disconnect]);
 
+useEffect(() => {
+  setAcceptedTerms(false);
+}, [currentContract?.contractId]);
 
 useEffect(() => {
   getCurrentWorker();
@@ -93,42 +86,23 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if(!worker) return;
+  if (!worker) return;
 
-  setPin(worker?.pin.toString() || "");
-  generateContractPdf(pin, availableContracts[contract]);
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [worker, contract]);
-
+  setPin(worker.pin?.toString() || "");
+  void generateContractPdf(worker.pin?.toString() || "");
+}, [worker, setPin, generateContractPdf]);
 
 
 
 
-const contractKeys = Object.keys(availableContracts).map(Number);
 
 
 
-const nextContract = () => {
-  if(contract > contractKeys.length)  {
-    setIsDone(true);
-   setIsSuccess(false);
-    setTimeout(() => {
-      setIsDone(false);
-      disconnect();
-    }, 1800);
 
-    return
-  }
-  const index = contractKeys.indexOf(contract);
-  const nextIndex = (index + 1) % contractKeys.length;
-  setContract(contractKeys[nextIndex]);
-};
 
-// const prevContract = () => {
-//   const index = contractKeys.indexOf(contract);
-//   const prevIndex = (index - 1 + contractKeys.length) % contractKeys.length;
-//   setContract(contractKeys[prevIndex]);
-// };
+
+
+
 
 
 
@@ -152,7 +126,7 @@ const nextContract = () => {
         <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />
         
         }
-      {isSuccess && <SignatureSuccess />}
+      {/* {isSuccess && <SignatureSuccess />} */}
       {isDone && <DoneSigning />}
       {isPinError && <NipError />}
 
@@ -212,8 +186,7 @@ const nextContract = () => {
 
      { acceptedTerms && 
      <SignatureBlock 
-     next={nextContract} 
-     contractId={currentContractId} 
+     contractId={currentContract?.contractId ?? 0} 
      acceptedTerms={acceptedTerms} 
      signedName={signedName} 
      setAcceptedTerms={setAcceptedTerms}

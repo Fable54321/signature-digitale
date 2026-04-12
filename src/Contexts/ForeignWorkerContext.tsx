@@ -5,7 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
- 
+  useRef,
   
   type ReactNode,
 } from "react";
@@ -56,7 +56,7 @@ type ForeignWorkerContextType = {
   error: string;
   pdfUrl: string | null;
   lookupByPin: (pinToLookup?: string) => Promise<boolean>;
-  generateContractPdf: (pinToUse?: string, contractSlug?: string) => Promise<boolean>;
+  generateContractPdf: (pinToUse?: string) => Promise<boolean>;
   clearWorker: () => void;
   clearPdf: () => void;
   disconnect: () => void;
@@ -66,7 +66,23 @@ type ForeignWorkerContextType = {
   signContract: SignContract;
   setError: React.Dispatch<React.SetStateAction<string>>;
   isPinError: boolean;
+  contracts: SessionContract[];
+setContracts: React.Dispatch<React.SetStateAction<SessionContract[]>>;
+currentIndex: number;
+setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+currentContract: SessionContract | null;
  
+};
+
+type SessionContract = {
+  contractId: number;
+  slug: string;
+  title: string;
+  status: "draft" | "signed";
+  templateVersion: string | null;
+  accessUrl: string | null;
+  isReady: boolean;
+  reused: boolean;
 };
 
 
@@ -92,9 +108,152 @@ export const ForeignWorkerProvider = ({
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [currentContractId, setCurrentContractId] = useState<number>(0);
- 
-  
+  const [contracts, setContracts] = useState<SessionContract[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  const prefetchedPdfBlobsRef = useRef<Map<number, string>>(new Map());
+  
+const currentContract = useMemo(
+  () => contracts[currentIndex] ?? null,
+  [contracts, currentIndex]
+);
+
+const ensureContractAccess = useCallback(
+  async (contractId: number) => {
+    const target = contracts.find((c) => c.contractId === contractId);
+
+    if (!target) {
+      return null;
+    }
+
+    if (target.accessUrl) {
+      return target.accessUrl;
+    }
+
+    try {
+      const res = await axios.get(
+        `${baseUrl}/signature/foreign-worker-contract/${contractId}/access`
+      );
+
+      const accessUrl = res.data.accessUrl;
+
+      if (!accessUrl) {
+        throw new Error("URL d'accès manquante");
+      }
+
+      setContracts((prev) =>
+        prev.map((contract) =>
+          contract.contractId === contractId
+            ? { ...contract, accessUrl }
+            : contract
+        )
+      );
+
+      return accessUrl;
+    } catch (err) {
+      console.error("Erreur lors de la récupération de l'accès au contrat:", err);
+      setError("Erreur lors de la récupération du PDF");
+      return null;
+    }
+  },
+  [contracts]
+);
+
+const prefetchContractFile = useCallback(
+  async (contractId: number) => {
+    if (prefetchedPdfBlobsRef.current.has(contractId)) {
+      return prefetchedPdfBlobsRef.current.get(contractId) ?? null;
+    }
+
+    const target = contracts.find((c) => c.contractId === contractId);
+
+    if (!target) {
+      return null;
+    }
+
+    let accessUrl = target.accessUrl;
+
+    if (!accessUrl) {
+      accessUrl = await ensureContractAccess(contractId);
+    }
+
+    if (!accessUrl) {
+      return null;
+    }
+
+    try {
+      const response = await fetch(accessUrl);
+
+      if (!response.ok) {
+        throw new Error("Impossible de précharger le PDF");
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      prefetchedPdfBlobsRef.current.set(contractId, blobUrl);
+
+      return blobUrl;
+    } catch (err) {
+      console.error("Erreur lors du préchargement du PDF:", err);
+      return null;
+    }
+  },
+  [contracts, ensureContractAccess]
+);
+
+useEffect(() => {
+  if (!currentContract) return;
+
+  void ensureContractAccess(currentContract.contractId);
+}, [currentContract, ensureContractAccess]);
+
+useEffect(() => {
+  if (!currentContract) {
+    setPdfUrl(null);
+    return;
+  }
+
+  const blobUrl = prefetchedPdfBlobsRef.current.get(currentContract.contractId);
+
+  if (blobUrl) {
+    setPdfUrl(blobUrl);
+    return;
+  }
+
+  setPdfUrl(currentContract.accessUrl ?? null);
+}, [currentContract]);
+
+
+const nextContract = useMemo(
+  () => contracts[currentIndex + 1] ?? null,
+  [contracts, currentIndex]
+);
+
+useEffect(() => {
+  if (!nextContract) return;
+  if (nextContract.accessUrl) return;
+
+  void ensureContractAccess(nextContract.contractId);
+}, [nextContract, ensureContractAccess]);
+
+useEffect(() => {
+  if (!nextContract) return;
+
+  void prefetchContractFile(nextContract.contractId);
+}, [nextContract, prefetchContractFile]);
+
+useEffect(() => {
+  const blobs = prefetchedPdfBlobsRef.current;
+
+  return () => {
+    blobs.forEach((blobUrl) => {
+      URL.revokeObjectURL(blobUrl);
+    });
+
+    blobs.clear();
+  };
+}, []);
 
   const clearPdf = useCallback(() => {
     setPdfUrl(null);
@@ -180,13 +339,7 @@ const disconnect = useCallback(
     [pin]
   );
 
-  useEffect(() => {
-  return () => {
-    if (pdfUrl) {
-      URL.revokeObjectURL(pdfUrl);
-    }
-  };
-}, [pdfUrl]);
+
 
 
   const getCurrentWorker = useCallback((async () => {
@@ -225,7 +378,7 @@ const disconnect = useCallback(
   }), [])
 
 const generateContractPdf = useCallback(
-  async (pinToUse?: string, contractSlug?: string) => {
+  async (pinToUse?: string) => {
     const finalPin = pinToUse ?? pin;
 
     if (!finalPin) {
@@ -237,45 +390,36 @@ const generateContractPdf = useCallback(
       setPdfLoading(true);
       setError("");
 
-      const createRes = await axios.post(
-        `${baseUrl}/signature/foreign-worker-contract/by-pin`,
+      const res = await axios.post(
+        `${baseUrl}/signature/foreign-worker-contract/session/by-pin`,
         {
           pin: finalPin,
-          contractSlug,
         }
       );
 
-      const { contractId } = createRes.data;
+      const { contracts: sessionContracts, currentIndex: sessionCurrentIndex } = res.data;
 
-      if (!contractId) {
-        throw new Error("contractId manquant");
+      if (!Array.isArray(sessionContracts) || sessionContracts.length === 0) {
+        throw new Error("Aucun contrat retourné");
       }
 
-      const urlRes = await axios.get(
-        `${baseUrl}/signature/foreign-worker-contract/${contractId}/url`
+      setContracts(sessionContracts);
+      setCurrentIndex(
+        typeof sessionCurrentIndex === "number" && sessionCurrentIndex >= 0
+          ? sessionCurrentIndex
+          : 0
       );
 
-      const { url } = urlRes.data;
-
-      if (!url) {
-        throw new Error("URL signée manquante");
-      }
-
-      setCurrentContractId(contractId);
-      setPdfUrl(url);
-
-      return contractId;
+      return true;
     } catch (err) {
-      console.error("Erreur lors de la génération/récupération du PDF:", err);
-      setError("Erreur lors de la génération du PDF");
-   
-       
+      console.error("Erreur lors de la préparation des contrats:", err);
+      setError("Erreur lors de la préparation des contrats");
       return false;
     } finally {
       setPdfLoading(false);
     }
   },
-  [pin]
+  [pin, setContracts, setCurrentIndex]
 );
 
 
@@ -285,7 +429,6 @@ const signContract = useCallback<SignContract>(
     signatureDataUrl,
     acceptedTerms,
     signedName,
-    
   }) => {
     if (!contractId) {
       setError("Contrat introuvable");
@@ -315,19 +458,21 @@ const signContract = useCallback<SignContract>(
         }
       );
 
-      const urlRes = await axios.get(
-        `${baseUrl}/signature/foreign-worker-contract/${contractId}/url`
+      const updatedContracts = contracts.map((contract) =>
+        contract.contractId === contractId
+          ? { ...contract, status: "signed" as const }
+          : contract
       );
 
-      const { url } = urlRes.data;
+      setContracts(updatedContracts);
 
-      if (!url) {
-        throw new Error("URL signée manquante");
+      const nextUnsignedIndex = updatedContracts.findIndex(
+        (contract) => contract.status !== "signed"
+      );
+
+      if (nextUnsignedIndex >= 0) {
+        setCurrentIndex(nextUnsignedIndex);
       }
-
-      setPdfUrl(url);
-
-       
 
       return true;
     } catch (err) {
@@ -338,51 +483,61 @@ const signContract = useCallback<SignContract>(
       setPdfLoading(false);
     }
   },
-  []
+  [contracts]
 );
  
 
-  const value = useMemo(
-    () => ({
-      pin,
-      setPin,
-      worker,
-      loading,
-      pdfLoading,
-      error,
-      pdfUrl,
-      lookupByPin,
-      generateContractPdf,
-      clearWorker,
-      clearPdf,
-      disconnect,
-      getCurrentWorker,
-      currentContractId,
-      setCurrentContractId,
-      signContract,
-      setError,
-      isPinError
-    }),
-    [
-      pin,
-      worker,
-      loading,
-      pdfLoading,
-      error,
-      pdfUrl,
-      lookupByPin,
-      generateContractPdf,
-      clearWorker,
-      clearPdf,
-      disconnect,
-      getCurrentWorker,
-      currentContractId,
-      setCurrentContractId,
-      signContract,
-      setError,
-      isPinError
-    ]
-  );
+const value = useMemo(
+  () => ({
+    pin,
+    setPin,
+    worker,
+    loading,
+    pdfLoading,
+    error,
+    pdfUrl,
+    lookupByPin,
+    generateContractPdf,
+    clearWorker,
+    clearPdf,
+    disconnect,
+    getCurrentWorker,
+    currentContractId,
+    setCurrentContractId,
+    signContract,
+    setError,
+    isPinError,
+    contracts,
+    setContracts,
+    currentIndex,
+    setCurrentIndex,
+    currentContract,
+  }),
+  [
+    pin,
+    worker,
+    loading,
+    pdfLoading,
+    error,
+    pdfUrl,
+    lookupByPin,
+    generateContractPdf,
+    clearWorker,
+    clearPdf,
+    disconnect,
+    getCurrentWorker,
+    currentContractId,
+    setCurrentContractId,
+    signContract,
+    setError,
+    isPinError,
+    contracts,
+    setContracts,
+    currentIndex,
+    setCurrentIndex,
+    currentContract,
+  ]
+);
 
   return (
     <ForeignWorkerContext.Provider value={value}>
