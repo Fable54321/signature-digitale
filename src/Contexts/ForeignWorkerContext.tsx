@@ -285,7 +285,7 @@ const disconnect = useCallback(
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(null))
       );
-
+      setPin("");
       location.replace("/");
      
       return true;

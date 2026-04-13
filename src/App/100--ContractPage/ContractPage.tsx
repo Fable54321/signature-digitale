@@ -148,9 +148,9 @@ useEffect(() => {
 
       
 
-        {!isLoading && pdfUrl && (
+        {pdfUrl && (
          <div className="flex justify-center">
-           <Document file={pdfUrl} onLoadSuccess={onLoadSuccess}>
+           <Document file={pdfUrl} onLoadSuccess={onLoadSuccess} loading={<div className="flex flex-col items-center justify-center h-60"><Spinner /></div>} error={<div className="flex flex-col items-center justify-center h-60"><p className="text-red-500 text-[1.5em]">Error al cargar el PDF</p></div>} >
               {Array.from({ length: numPages }, (_, index) => (
           <div
             key={index}
