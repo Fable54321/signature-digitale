@@ -69,7 +69,7 @@ useEffect(() => {
   const timeout = setTimeout(() => {
     setIsDone(false);
     void disconnect();
-  }, 1800);
+  }, 1200);
 
   return () => clearTimeout(timeout);
 }, [isAllSigned, disconnect]);
@@ -97,7 +97,17 @@ useEffect(() => {
 
 
 
+const scrollToBottom = () => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+  });
+};
 
+
+useEffect(() => {
+  scrollToBottom();
+},[acceptedTerms])
 
 
 
@@ -121,7 +131,7 @@ useEffect(() => {
       </div>
       )}
 
-       {!isIdentityConfirmed && worker && !isPinError &&
+       {!isIdentityConfirmed && worker && !isPinError && !isAllSigned &&
        
         <IdentityConfirmation worker={worker} setIsIdentityConfirmed={setIsIdentityConfirmed} disconnect={disconnect} loading={loading} />
         
