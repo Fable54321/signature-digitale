@@ -328,9 +328,9 @@ const disconnect = useCallback(
 
            setIsPinError(true);
 
-      setTimeout(() => {
-        location.replace("/");
-      }, 1500);
+      // setTimeout(() => {
+      //   location.replace("/");
+      // }, 1500);
         return false;
       } finally {
         setLoading(false);
