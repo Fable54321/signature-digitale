@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Delete } from "lucide-react"
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Contexts/AuthContext";
 
 
 
@@ -9,14 +10,16 @@ const NumPad = () => {
 
 const [currentPin, setCurrentPin] = useState<number[]>([]);
 
-
+const { user } = useAuth();
 
 const { lookupByPin, pin, setPin, getCurrentWorker } = useForeignWorker();
 
 const navigate = useNavigate();
 
 
-
+useEffect(() => {
+  console.log(user?.appAccess);
+},[user])
 
 
 
