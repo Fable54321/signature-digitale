@@ -8,6 +8,8 @@ import SignatureBlock from "../../Components/SignatureBlock";
 import DoneSigning from "../../Components/DoneSigning";
 import NipError from "../../Components/NipError";
 import "../../Components/CSS/IdentityConfirmation.css";
+import { scrollToBottom } from "../../Utils/scrollToBottom";
+import { useNavigate } from "react-router-dom";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -25,6 +27,7 @@ const ContractPage = () => {
     currentContract,
     contracts,
     isPinError,
+    pin,
   } = useForeignWorker();
 
   const [numPages, setNumPages] = useState<number>(0);
@@ -50,7 +53,22 @@ const ContractPage = () => {
     void generateContractPdf();
   }, [generateContractPdf]);
 
-  
+ useEffect(() => {
+   if(acceptedTerms) scrollToBottom();
+  }, [acceptedTerms]);
+
+
+const navigate = useNavigate();
+
+useEffect(()=> {
+  if(!pin || pin.length === 0) {
+
+    void navigate("/");
+
+  }
+},[navigate, pin]);
+
+
 
   useEffect(() => {
     if (!isAllSigned) return;
@@ -69,6 +87,8 @@ const ContractPage = () => {
   useEffect(() => {
     setAcceptedTerms(false);
   }, [currentContract?.contractId]);
+
+
 
   useEffect(() => {
     setNumPages(0);
@@ -96,7 +116,7 @@ const ContractPage = () => {
 
       {!isLoading && worker && currentContract && !isDone && (
         <article
-          className={`flex flex-col items-center w-full relative ${
+          className={`flex flex-col pb-6 items-center w-full relative ${
             !isIdentityConfirmed ? "blur-sm pointer-events-none" : ""
           }`}
         >
@@ -154,6 +174,7 @@ const ContractPage = () => {
               type="checkbox"
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
+
             />
             <span className="text-[0.7em] font-light">(Marcar la casilla)</span>
             Confirmo que he leído y comprendido la información anterior.

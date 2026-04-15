@@ -19,7 +19,7 @@ const SignatureBlock = ({
 }: SignatureBlockProps) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
 
-  const { signContract, pdfLoading, setError } = useForeignWorker();
+  const { signContract, pdfLoading, setError, error } = useForeignWorker();
 
   const clear = () => {
     if (!sigCanvas.current) return;
@@ -33,7 +33,7 @@ const SignatureBlock = ({
     }
 
     if (sigCanvas.current.isEmpty()) {
-      setError("Veuillez ajouter votre signature");
+      setError("Por favor agregue su firma");
       return;
     }
 
@@ -58,7 +58,9 @@ const SignatureBlock = ({
   };
 
   return (
+
     <section className="flex flex-col gap-2">
+      {error && <p className="text-red-600">{error}</p>}
       <div className="bg-white border-2 border-black mt-4">
         <SignatureCanvas
           ref={sigCanvas}
