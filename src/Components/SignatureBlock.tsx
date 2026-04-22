@@ -59,9 +59,9 @@ const SignatureBlock = ({
 
   return (
 
-    <section className="flex flex-col gap-2">
+    <section className="flex flex-col gap-2 mb-100">
       {error && <p className="text-red-600">{error}</p>}
-      <div className="bg-white border-2 border-black mt-4">
+      <div className="bg-white border-2 border-black my-40">
         <SignatureCanvas
           ref={sigCanvas}
           penColor="black"
