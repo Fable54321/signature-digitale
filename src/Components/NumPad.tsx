@@ -54,7 +54,7 @@ const NumPad = () => {
     <section className="desktop-quick w-full flex flex-col items-center relative">
       <h2 className="font-medium text-[1.9em]">Introduce tu PIN</h2>
 <div className="w-[min(98%,900px)] flex flex-col items-center">
-      <p className="flex items-center bg-white justify-center border-2 text-[9em] border-gray-400 rounded-lg w-full tracking-widest leading-none py-1 text-center ">
+      <p className="flex items-center bg-white justify-center border-2 text-[9em] border-gray-400 rounded-lg w-full tracking-widest h-38 text-center ">
         {currentPin.join("")}
       </p>
 
