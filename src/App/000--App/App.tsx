@@ -7,7 +7,7 @@ function App() {
 
   return (
     <article className='flex flex-col items-center gap-2 font-secondary md:text-[1rem] text-[0.9rem] h-[90vh] justify-center' >
-      <div className='xl:mt-50'>
+      <div className='mt-20'>
         <img src={vegibecLogo} alt="Vegibec Logo" className='w-70 sm:w-80 ' />
       </div>
       <NumPad />
