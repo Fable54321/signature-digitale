@@ -3,7 +3,7 @@ import { Delete } from "lucide-react";
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Contexts/AuthContext";
-import "./CSS/NumPad.css";
+import "./CSS/Numpad.css";
 
 const NumPad = () => {
   const [currentPin, setCurrentPin] = useState<number[]>([]);
