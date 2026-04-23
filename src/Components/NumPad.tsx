@@ -19,8 +19,8 @@ const NumPad = () => {
 
   const handleAddNumber = (numEntered: number) => () => {
     setCurrentPin((prev) => {
-      if (prev.length === 5) {
-        alert("No puedes introducir más de 5 números");
+      if (prev.length === 6) {
+        alert("No puedes introducir más de 6 números");
         return prev;
       }
 
