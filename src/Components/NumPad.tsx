@@ -31,8 +31,8 @@ const NumPad = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (pin.length !== 5) {
-      alert("El PIN debe contener 5 números");
+    if (pin.length < 5 || pin.length > 6) {
+      alert("El PIN debe contener 5 o 6 números");
       return;
     }
 
