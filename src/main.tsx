@@ -12,6 +12,7 @@ import VisitorsMainPage from './App/5000--VisitorsSection/100--VisitorsMainPage/
 import ChecklistBox from './App/5000--VisitorsSection/100--VisitorsMainPage/101--ChecklistBox/ChecklistBox'
 import VisitorsHome from './App/5000--VisitorsSection/100--VisitorsMainPage/1001--VisitorsHome/VisitorsHome'
 import DeparturePage from './App/5000--VisitorsSection/100--VisitorsMainPage/102--DeparturePage/DeparturePage'
+import { VisitorsProvider } from './App/5000--VisitorsSection/Contexts/VisitorsContext/VisitorsProvider'
 
 
 const router = createBrowserRouter([
@@ -45,7 +46,9 @@ const router = createBrowserRouter([
     path: '/visiteurs',
     element: (
       <ProtectedRoute>
+        <VisitorsProvider>
     <VisitorsMainPage />
+    </VisitorsProvider>
     </ProtectedRoute>
   ),
   children : [

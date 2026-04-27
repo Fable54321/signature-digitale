@@ -2,14 +2,14 @@ import { createContext } from "react";
 
 
 
-type activeSessionType = {
+export type activeSessionType = {
     arrival_time: Date;
     full_name: string;
     company_name: string;
     visit_reason: string;
 }
 
-type fullSessionType = activeSessionType & {
+export type fullSessionType = activeSessionType & {
     departure_time: Date;
     arrival_signature_url: string;
     departure_signature_url: string;
@@ -17,14 +17,17 @@ type fullSessionType = activeSessionType & {
 }
 
 
-type VisitorsContextType = {
-    startVisitorSession: () => void;
+type VisitorsContextType = { 
+    startVisitorSession: (payload: activeSessionType) => Promise<void>;
     endVisitorSession: () => void;
-    getActiveSession: () => void;
+    getActiveSession: () => activeSessionType | null;
     activeSession: activeSessionType | null;
-    setActiveSession: React.Dispatch<React.SetStateAction<number | null>>;
-    getFullSession: () => void;
+    setActiveSession: React.Dispatch<React.SetStateAction<activeSessionType | null>>;
+    getFullSession: () => fullSessionType | null;
     fullSession: fullSessionType | null;
+    startVisitorSessionLoading: boolean;
+    setStartVisitorSessionLoading: React.Dispatch<React.SetStateAction<boolean>>;
+
 };
 
-export const VisitorsContext = createContext<VisitorsContextType>({} as VisitorsContextType);
+export const VisitorsContext = createContext<VisitorsContextType | undefined>(undefined);
