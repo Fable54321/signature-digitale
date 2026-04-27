@@ -16,6 +16,23 @@ export type fullSessionType = activeSessionType & {
 
 }
 
+export type CheckBoxType = {
+    isAuthorizedArea: boolean;
+      isRestrictedArea: boolean;
+      isWashingHands: boolean;
+      isNoManipulation: boolean,
+      isAppropriateWear: boolean,
+      isCleanShoes: boolean,
+}
+
+export type ActiveSessionPayload = activeSessionType & {
+    full_name: string;
+    company_name: string;
+    visit_reason: string;
+    arrival_signature_url: string;
+    checklist: CheckBoxType;
+}
+
 
 type VisitorsContextType = { 
     startVisitorSession: (payload: activeSessionType) => Promise<void>;

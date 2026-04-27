@@ -5,6 +5,7 @@ import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 // import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
+// import type { ActiveSessionPayload } from "../../Contexts/VisitorsContext/VisitorsContext";
 
 type ChecklistKey = keyof typeof rules;
 type ChecklistState = Record<ChecklistKey, boolean>;
@@ -49,15 +50,20 @@ const ChecklistBox = () => {
     
     // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     //   e.preventDefault();
-    //   const payload = {
-    //     ...checklist,
-    //     isOtherChecked,
-    //     isUnderstandingChecked,
-    //     otherContent,
+    //   const payload : ActiveSessionPayload = {
+    //     full_name: fullName,
+    //     company_name: companyName,
+    //     visit_reason: visitReason,
+    //     arrival_time: new Date(),
+    //     arrival_signature_url: "",
+    //     checklist: checklist,
+        
     //   };
     //   await startVisitorSession(payload);
     // };
 
+
+   
 
 
   return (
