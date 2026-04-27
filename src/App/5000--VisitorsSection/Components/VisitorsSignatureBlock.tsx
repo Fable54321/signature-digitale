@@ -19,7 +19,7 @@ if(!sigCanvas.current){
     return;
 }
 
-    const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
+    // const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
 
    
 
