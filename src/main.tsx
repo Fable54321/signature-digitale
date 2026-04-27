@@ -8,6 +8,7 @@ import ContractPage from './App/100--ContractPage/ContractPage'
 import Admin from './App/200--Admin/Admin'
 import { AuthProvider } from './Contexts/AuthContext'
 import ProtectedRoute from './Components/ProtectedRoute'
+import VisitorsMainPage from './App/5000--VisitorsSection/100--VisitorsMainPage/VisitorsMainPage'
 
 
 const router = createBrowserRouter([
@@ -36,7 +37,15 @@ const router = createBrowserRouter([
     <Admin />
     </ProtectedRoute>
   ),
-  }
+  },
+  {
+    path: '/visiteurs',
+    element: (
+      <ProtectedRoute>
+    <VisitorsMainPage />
+    </ProtectedRoute>
+  ),
+  },
 
 ])
 
