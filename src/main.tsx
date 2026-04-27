@@ -9,6 +9,9 @@ import Admin from './App/200--Admin/Admin'
 import { AuthProvider } from './Contexts/AuthContext'
 import ProtectedRoute from './Components/ProtectedRoute'
 import VisitorsMainPage from './App/5000--VisitorsSection/100--VisitorsMainPage/VisitorsMainPage'
+import ChecklistBox from './App/5000--VisitorsSection/100--VisitorsMainPage/101--ChecklistBox/ChecklistBox'
+import VisitorsHome from './App/5000--VisitorsSection/100--VisitorsMainPage/1001--VisitorsHome/VisitorsHome'
+import DeparturePage from './App/5000--VisitorsSection/100--VisitorsMainPage/102--DeparturePage/DeparturePage'
 
 
 const router = createBrowserRouter([
@@ -45,6 +48,32 @@ const router = createBrowserRouter([
     <VisitorsMainPage />
     </ProtectedRoute>
   ),
+  children : [
+    {
+      index: true,
+      element: (
+        <ProtectedRoute>
+        <VisitorsHome />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: '/visiteurs/arrivee',
+      element: (
+        <ProtectedRoute>
+      <ChecklistBox />
+      </ProtectedRoute>
+      ),
+  },
+  {
+    path: '/visiteurs/depart',
+    element: (
+      <ProtectedRoute>
+      <DeparturePage />
+      </ProtectedRoute>
+    ),
+  }
+]
   },
 
 ])

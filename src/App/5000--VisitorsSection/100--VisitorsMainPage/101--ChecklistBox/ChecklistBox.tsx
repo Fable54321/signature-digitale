@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { rules } from "../../Utils/Rules";
 import { Check } from "lucide-react";
+import { scrollToBottom } from "../../../../Utils/scrollToBottom";
+import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 
 type ChecklistKey = keyof typeof rules;
 type ChecklistState = Record<ChecklistKey, boolean>;
@@ -19,10 +21,13 @@ const ChecklistBox = () => {
     });
 
     const [isOtherChecked, setIsOtherChecked] = useState(false);
+    const [isUnderstandingChecked, setIsUnderstandingChecked] = useState(false);
 
     useEffect(()=> {
-      console.log(checklist);
-    },[checklist])
+      if(isUnderstandingChecked) {
+        scrollToBottom();
+      }
+    },[isUnderstandingChecked])
 
 
 
@@ -74,7 +79,24 @@ const ChecklistBox = () => {
               className="hidden"
             />
         </div>
+        <div className="flex flex-col gap-2 items-center py-3">
+<p className="text-center">J'ai pris conscience et je comprends la politique <span>(cochez la case, puis signer dans l'espace à cet effet)</span></p>
+  <label className={` w-14 h-14 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${isUnderstandingChecked ? "bg-secondary" : "bg-white"}`} htmlFor={`rule-accept`}>
+              {<Check className="text-white" size={30}   />}
+            </label>
+            <input
+            id={`rule-accept`}
+              type="checkbox"
+              checked={isUnderstandingChecked}
+              onChange={(e) => {
+                setIsUnderstandingChecked(e.target.checked);
+              }}
+              className="hidden"
+            />
 </div>
+{isUnderstandingChecked && <VisitorsSignatureBlock />}
+</div>
+
       </form>
     </section>
   )
