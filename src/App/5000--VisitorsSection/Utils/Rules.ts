@@ -5,6 +5,5 @@ export const rules = {
 "isNoManipulation": "Éviter de manipuler les fruits et légumes ou les fournitures sans autorisation.",
 "isAppropriateWear": "Porter les vêtements de protection ou les accessoires de salubrités nécessaires, y compris :",
 "isCleanShoes": "Porter des chaussures propres, les changer ou les couvrir avant d'entrer si elles sont sales ou souillées.",
-"isOther": "Autre (précisez) :",
-"isApproved": "Signer ci-dessous pour indiquer qu'ils sont au courant de la politique et qu'ils la comprennent.",
+
 }
