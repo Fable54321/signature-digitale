@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { rules } from "../../Utils/Rules";
 import { Check } from "lucide-react";
 import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
-// import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
+import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
-// import type { ActiveSessionPayload } from "../../Contexts/VisitorsContext/VisitorsContext";
+
 
 type ChecklistKey = keyof typeof rules;
 type ChecklistState = Record<ChecklistKey, boolean>;
@@ -23,9 +23,14 @@ const ChecklistBox = () => {
     
     });
 
+    const { startVisitorSession } = useVisitors();
+
     const [fullName, setFullName] = useState("");
     const [companyName, setCompanyName] = useState("");
     const [visitReason, setVisitReason] = useState("");
+    const [wantsEmail, setWantsEmail] = useState(false);
+    const [email, setEmail] = useState("");
+    const [visitorCategory, setVisitorCategory] = useState("");
 
     const [isOtherChecked, setIsOtherChecked] = useState(false);
     const [isUnderstandingChecked, setIsUnderstandingChecked] = useState(false);
@@ -33,6 +38,12 @@ const ChecklistBox = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const [isInfoCompleted, setIsInfoCompleted] = useState(false);
+
+    const isAllChecked = useMemo(() => {
+      return Object.values(checklist).every((value) => value);
+    }, [checklist]);
+
+    useEffect(()=> { console.log(isAllChecked) },[isAllChecked, checklist])
 
     useEffect(()=> {
       if(isUnderstandingChecked) {
@@ -46,23 +57,31 @@ const ChecklistBox = () => {
       }, 1000);
     },[currentDate]);
 
-    // const { startVisitorSession } = useVisitors();
-    
-    // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    //   e.preventDefault();
-    //   const payload : ActiveSessionPayload = {
-    //     full_name: fullName,
-    //     company_name: companyName,
-    //     visit_reason: visitReason,
-    //     arrival_time: new Date(),
-    //     arrival_signature_url: "",
-    //     checklist: checklist,
-        
-    //   };
-    //   await startVisitorSession(payload);
-    // };
 
 
+const handleSubmit = async (signatureDataUrl: string) => {
+
+  if(!isAllChecked){
+    alert("Veuillez lire et accepter tous les termes.");
+    return;
+  }
+
+
+ const payload = {
+  arrival_time: new Date().toISOString(),
+  full_name: fullName,
+  company_name: companyName,
+  visit_reason: visitReason,
+  signatureDataUrl: signatureDataUrl,
+
+  checklist,
+  other_content: otherContent,
+  wants_email: wantsEmail,
+  email,
+};
+
+  await startVisitorSession(payload);
+};
    
 
 
@@ -73,7 +92,21 @@ const ChecklistBox = () => {
         isInfoCompleted ? "Politique pour les visiteurs" : "Informations du visiteur" 
        
         }</h2>
-     {!isInfoCompleted && <VisitorInfo fullName={fullName} currentDate={currentDate} setFullName={setFullName} companyName={companyName} setCompanyName={setCompanyName} visitReason={visitReason} setVisitReason={setVisitReason} setIsInfoCompleted={setIsInfoCompleted} />} 
+     {!isInfoCompleted && <VisitorInfo 
+     fullName={fullName} 
+     currentDate={currentDate} 
+     setFullName={setFullName} 
+     companyName={companyName} 
+     setCompanyName={setCompanyName} 
+     visitReason={visitReason} 
+     setVisitReason={setVisitReason} 
+     setIsInfoCompleted={setIsInfoCompleted}
+     wantsEmail={wantsEmail}
+     setWantsEmail={setWantsEmail}
+     email={email}
+     setEmail={setEmail}
+     visitorCategory={visitorCategory}
+     setVisitorCategory={setVisitorCategory} />} 
          <form action="" className="px-4">
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.2em] mt-2">
@@ -135,7 +168,7 @@ const ChecklistBox = () => {
               className="hidden"
             />
 </div>
-{isUnderstandingChecked && <VisitorsSignatureBlock />}
+{isUnderstandingChecked && <VisitorsSignatureBlock onValidate={handleSubmit} />}
 </div>}
 
       </form>

@@ -1,6 +1,11 @@
 import { useCallback, useState } from "react";
 import { fetchWithAuth } from "../../Utils/fetchWithAuth";
-import { VisitorsContext, type activeSessionType, type fullSessionType } from "./VisitorsContext";
+import { 
+    VisitorsContext, 
+    type ActiveSessionPayload, 
+    type activeSessionType, 
+    type fullSessionType,
+type SignatureResponse } from "./VisitorsContext";
 
 
 type Props = {
@@ -18,29 +23,58 @@ export const VisitorsProvider = ({ children }: Props) => {
     const [fullSession, setFullSession] = useState<fullSessionType | null>(null);
 
 
-     const startVisitorSession = useCallback(async (payload: activeSessionType) => {
+   const startVisitorSession = useCallback(async (payload: ActiveSessionPayload) => {
+  if (!payload) return;
 
-         if (!payload) return;
+  try {
+    setStartVisitorSessionLoading(true);
 
-       try {
+    console.log(payload);
 
-         setStartVisitorSessionLoading(true);
+    let arrival_signature_key = payload.signatureDataUrl;
 
-          await fetchWithAuth(`/visitors/start`, {
-           method: "POST",
-           body: JSON.stringify(payload),
-         });
-
-         setStartVisitorSessionLoading(false);
-
-       } catch (error) {
-         console.error(error);
-         setStartVisitorSessionLoading(false);
-       }
+    
+    if (payload.signatureDataUrl?.startsWith("data:image")) {
+    const signatureData = await fetchWithAuth<SignatureResponse>(`/visitors/signature`, {
+  method: "POST",
+  body: {
+    signatureDataUrl: payload.signatureDataUrl,
+  },
+});
 
 
-        
-     }, []);
+      if (!signatureData) {
+        throw new Error("Erreur upload signature");
+      }
+
+      
+
+      arrival_signature_key = signatureData.key;
+    }
+
+  
+   const createdSession = await fetchWithAuth<activeSessionType>(`/visitors/start`, {
+  method: "POST",
+  body: {
+    ...payload,
+    arrival_signature_key,
+  },
+});
+
+
+    if (!createdSession) {
+      throw new Error("Erreur création visiteur");
+    }
+
+    
+
+    setActiveSession(createdSession);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setStartVisitorSessionLoading(false);
+  }
+}, []);
 
      const endVisitorSession = useCallback(() => {
          setActiveSession(null);

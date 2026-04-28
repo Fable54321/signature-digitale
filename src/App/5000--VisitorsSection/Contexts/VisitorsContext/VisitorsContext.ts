@@ -3,7 +3,7 @@ import { createContext } from "react";
 
 
 export type activeSessionType = {
-    arrival_time: Date;
+    arrival_time: string;
     full_name: string;
     company_name: string;
     visit_reason: string;
@@ -29,13 +29,17 @@ export type ActiveSessionPayload = activeSessionType & {
     full_name: string;
     company_name: string;
     visit_reason: string;
-    arrival_signature_url: string;
+    signatureDataUrl: string;
     checklist: CheckBoxType;
+}
+export type SignatureResponse ={
+    key: string;
+    url: string;
 }
 
 
 type VisitorsContextType = { 
-    startVisitorSession: (payload: activeSessionType) => Promise<void>;
+    startVisitorSession: (payload: ActiveSessionPayload) => Promise<void>;
     endVisitorSession: () => void;
     getActiveSession: () => activeSessionType | null;
     activeSession: activeSessionType | null;
