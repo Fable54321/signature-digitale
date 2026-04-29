@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+
 import { useEffect } from "react";
 
 type Props = {
@@ -27,7 +27,7 @@ const VisitorInfo = ({ fullName,
     setIsInfoCompleted,
     currentDate,
     wantsEmail,
-    setWantsEmail,
+
     email,
     setEmail,
     visitorCategory,
@@ -101,35 +101,28 @@ const VisitorInfo = ({ fullName,
       
     {visitorCategory !== "gouvernement" && visitorCategory !== "" && <div className=" flex flex-col items-center my-4">
       <div className="flex items-center justify-center gap-4">
-      <p className="max-w-[85%] text-[1.3em]">Souhaitez-vous recevoir le plan du site par courriel ?</p>
-      <label className={` w-10 h-10 rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${wantsEmail ? "bg-secondary" : "bg-white"}`} htmlFor={`wants-email`}>
-              {wantsEmail && <Check className="text-white" size={30} />}
-            </label>
-            <input
-            id={`wants-email`}
-              type="checkbox"
-              checked={wantsEmail}
-              onChange={(e) => {
-             setWantsEmail(e.target.checked);
-              }}
-              className="hidden"
-            />
+      <p className="max-w-[85%] text-[1.3em]">Le plan du site est disponible via le code QR ci-dessus, mais il est recommandé d'entrer votre addresse courriel pour avoir une copie de l'url</p>
+     
+          
             </div>
-            <p className=" text-[0.8em] ">(Vegibec inc. ne conservera pas votre addresse courriel.)</p>
-      </div>  }
-              
-      {wantsEmail && (
-       <label htmlFor="email" className="flex flex-col ">
-       <span className="text-[1.3em]"> Entrez votre addresse courriel: </span>
+
+ <label htmlFor="email" className="flex flex-col w-full">
+       
         <input
-          className="border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
+          className=" border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
           type="email"
-          placeholder="exemple@ex.com"
+          placeholder="laissez vide pour ne pas recevoir de courriel"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
        </label>
-      )}
+
+            <p className=" text-[0.8em] ">(Vegibec inc. ne conservera pas votre addresse courriel.)</p>
+      </div>  }
+              
+       
+      
+      
 
       <button type="submit" className="button-generic text-[2.5em]">Suivant</button>
       

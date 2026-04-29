@@ -13,6 +13,7 @@ import ChecklistBox from './App/5000--VisitorsSection/100--VisitorsMainPage/101-
 import VisitorsHome from './App/5000--VisitorsSection/100--VisitorsMainPage/1001--VisitorsHome/VisitorsHome'
 import DeparturePage from './App/5000--VisitorsSection/100--VisitorsMainPage/102--DeparturePage/DeparturePage'
 import { VisitorsProvider } from './App/5000--VisitorsSection/Contexts/VisitorsContext/VisitorsProvider'
+import SitesPlan from './App/5000--VisitorsSection/100--VisitorsMainPage/103--SitesPlan/SitesPlan'
 
 
 const router = createBrowserRouter([
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
   }
 ]
   },
+  {
+    path: '/plan-du-site',
+    element: <SitesPlan />
+  }
 
 ])
 

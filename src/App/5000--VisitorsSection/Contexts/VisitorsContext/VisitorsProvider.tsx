@@ -66,9 +66,10 @@ export const VisitorsProvider = ({ children }: Props) => {
       throw new Error("Erreur création visiteur");
     }
 
-    
+    alert("infos de visite enregistrées avec succès")
 
     setActiveSession(createdSession);
+    location.replace(`/visiteurs`);
   } catch (error) {
     console.error(error);
   } finally {
