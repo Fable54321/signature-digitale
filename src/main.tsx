@@ -16,6 +16,13 @@ import { VisitorsProvider } from './App/5000--VisitorsSection/Contexts/VisitorsC
 import SitesPlan from './App/5000--VisitorsSection/100--VisitorsMainPage/103--SitesPlan/SitesPlan'
 
 
+const generateToken = () => {
+  return crypto.randomUUID();
+};
+
+
+const token = generateToken();    
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -46,11 +53,11 @@ const router = createBrowserRouter([
   {
     path: '/visiteurs',
     element: (
-      <ProtectedRoute>
-        <VisitorsProvider>
-    <VisitorsMainPage />
+  <ProtectedRoute>
+    <VisitorsProvider>
+       <VisitorsMainPage token={token} />
     </VisitorsProvider>
-    </ProtectedRoute>
+  </ProtectedRoute>
   ),
   children : [
     {
@@ -80,7 +87,7 @@ const router = createBrowserRouter([
 ]
   },
   {
-    path: '/plan-du-site',
+    path: '/plan-du-site/:token',
     element: <SitesPlan />
   }
 

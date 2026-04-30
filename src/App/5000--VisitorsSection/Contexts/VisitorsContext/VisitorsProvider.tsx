@@ -21,6 +21,7 @@ export const VisitorsProvider = ({ children }: Props) => {
     const [startVisitorSessionLoading, setStartVisitorSessionLoading] = useState(false);
     const [activeSession, setActiveSession] = useState<activeSessionType | null>(null);
     const [fullSession, setFullSession] = useState<fullSessionType | null>(null);
+    const [token, setToken] = useState<string>("");
 
 
    const startVisitorSession = useCallback(async (payload: ActiveSessionPayload) => {
@@ -106,7 +107,9 @@ export const VisitorsProvider = ({ children }: Props) => {
                 getFullSession,
                 fullSession,
                 startVisitorSessionLoading, 
-                setStartVisitorSessionLoading
+                setStartVisitorSessionLoading,
+                token,
+                setToken
             }}
         >
             {children}

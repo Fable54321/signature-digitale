@@ -1,5 +1,6 @@
 
 import { useEffect } from "react";
+import { Link, useOutletContext } from "react-router-dom";
 
 type Props = {
     fullName: string;
@@ -18,6 +19,9 @@ type Props = {
     setVisitorCategory: React.Dispatch<React.SetStateAction<string>>
 }
 
+
+type OutletContextType = { token: string };
+
 const VisitorInfo = ({ fullName,
     setFullName,
     companyName,
@@ -33,6 +37,12 @@ const VisitorInfo = ({ fullName,
     visitorCategory,
     setVisitorCategory,
  }: Props) => {
+
+
+
+
+
+  const { token } = useOutletContext<OutletContextType>();
 
 
     const handleInfoCompletion = (e: React.FormEvent<HTMLFormElement>) => {
@@ -54,6 +64,12 @@ const VisitorInfo = ({ fullName,
     useEffect(()=> {
       console.log(visitorCategory);
     },[visitorCategory])
+
+
+     
+
+
+  
 
 
 
@@ -120,7 +136,7 @@ const VisitorInfo = ({ fullName,
             <p className=" text-[0.8em] ">(Vegibec inc. ne conservera pas votre addresse courriel.)</p>
       </div>  }
               
-       
+       <Link to={`/plan-du-site/${token}`} target="_blank" className="text-[1.6em] font-bold text-secondary">Plan du site</Link>
       
       
 

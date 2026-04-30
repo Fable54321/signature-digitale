@@ -48,6 +48,8 @@ type VisitorsContextType = {
     fullSession: fullSessionType | null;
     startVisitorSessionLoading: boolean;
     setStartVisitorSessionLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    token: string;
+    setToken: React.Dispatch<React.SetStateAction<string>>;
 
 };
 

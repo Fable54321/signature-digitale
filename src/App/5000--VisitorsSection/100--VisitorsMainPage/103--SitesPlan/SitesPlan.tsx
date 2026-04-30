@@ -1,7 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
+
+const normalizeSearch = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 
 const SitesPlan = () => {
   const [showDots, setShowDots] = useState<Record<string, boolean>>({
@@ -75,23 +81,55 @@ const SitesPlan = () => {
     '48': false
   })
 
-  const [searchInput, setSearchInput] = useState('');
-  
- 
+  const dotRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-   const filteredBuildings = useMemo(() => {
-    return buildingsList.filter((building) => {
-      return building.slug.toLowerCase().normalize().includes(searchInput.normalize().toLowerCase()) || building.name.normalize().toLowerCase().includes(searchInput.toLowerCase().normalize());
+  const [searchInput, setSearchInput] = useState('');
+  const [pendingScrollSlug, setPendingScrollSlug] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (!pendingScrollSlug || !showDots[pendingScrollSlug]) {
+      return;
+    }
+
+    dotRefs.current[pendingScrollSlug]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
     });
-  }, [searchInput]);
+    setPendingScrollSlug(null);
+  }, [pendingScrollSlug, showDots]);
+
+  const handleToggleDot = (slug: string) => {
+    const nextValue = !showDots[slug];
+
+    setShowDots({ ...showDots, [slug]: nextValue });
+
+    if (nextValue) {
+      setPendingScrollSlug(slug);
+    }
+  };
+ 
+  
+
+  const filteredBuildings = useMemo(() => {
+    const search = normalizeSearch(searchInput);
+
+    return buildingsList.filter((building) => {
+      const matchesSearch =
+        search !== '' &&
+        (normalizeSearch(building.slug).includes(search) || normalizeSearch(building.name).includes(search));
+
+      return matchesSearch || showDots[building.slug];
+    });
+  }, [searchInput, showDots]);
 
   return (
-    <article className="flex flex-col items-center gap-3 pb-4">
+    <article className="flex flex-col items-center gap-6 pb-10">
 
       <section className='flex flex-col items-center'>
         <div className='relative fade-image'>
         <img className='' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
-          <GreenDots showDots={showDots} />
+          <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
       </section>
       <section className='flex flex-col items-center gap-4'>
@@ -100,13 +138,13 @@ const SitesPlan = () => {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Rechercher..."
-          className='border rounded-lg py-1 px-2 text-[1.2em]'
+          className='border rounded-lg py-1 px-2 text-[1.4em]'
         />
-        {searchInput && searchInput !== '' && <ul className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+        {filteredBuildings.length > 0 && <ul className='grid grid-cols-2 md:grid-cols-3 gap-2'>
           {filteredBuildings.map((building) => {
             return (
               <li key={building.slug} className=' w-full'>
-                <button className={`px-4 py-2 w-full rounded ${showDots[building.slug] ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'}`} onClick={() => setShowDots({ ...showDots, [building.slug]: !showDots[building.slug] })}>{building.slug + ' - '}{building.name}</button>
+                <button className={`px-4 py-2 w-full rounded hover:cursor-pointer ${showDots[building.slug] ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'}`} onClick={() => handleToggleDot(building.slug)}>{building.slug + ' - '}{building.name}</button>
               </li>
             )
           })}
@@ -116,4 +154,7 @@ const SitesPlan = () => {
   )
 }
 
+
+
 export default SitesPlan
+
