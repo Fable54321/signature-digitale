@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
+import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
 
 const normalizeSearch = (value: string) =>
   value
@@ -136,7 +137,7 @@ const SitesPlan = () => {
 
       {planUrl && <section className='flex flex-col items-center'>
         <div className='relative fade-image'>
-        <img className='' src={planUrl} alt="Plan aérien du 171, rang ste-Sophie" />
+        <img className='' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
           <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
       </section>}
@@ -148,7 +149,7 @@ const SitesPlan = () => {
           placeholder="Rechercher..."
           className='border rounded-lg py-1 px-2 text-[1.4em]'
         />
-        {filteredBuildings.length > 0 && <ul className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+        {filteredBuildings.length > 0 ? <ul className='grid grid-cols-2 md:grid-cols-3 gap-2'>
           {filteredBuildings.map((building) => {
             return (
               <li key={building.slug} className=' w-full'>
@@ -156,7 +157,16 @@ const SitesPlan = () => {
               </li>
             )
           })}
-        </ul>}
+        </ul> :
+          <ul className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+            {buildingsList.map((building) => {
+              return (
+                 <li key={building.slug} className=' w-full '>
+                <button className={`px-4 py-2 w-full rounded hover:cursor-pointer ${showDots[building.slug] ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'}`} onClick={() => handleToggleDot(building.slug)}>{building.slug + ' - '}{building.name}</button>
+              </li>
+              )
+            })}
+            </ul>}
       </section>}
     </article>
   )
