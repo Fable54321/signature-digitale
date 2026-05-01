@@ -1,6 +1,6 @@
-
-import { useEffect } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { fetchWithAuth } from "../Utils/fetchWithAuth";
 
 type Props = {
     fullName: string;
@@ -21,6 +21,11 @@ type Props = {
 
 
 type OutletContextType = { token: string };
+type PlanUrlResponse = {
+    url: string;
+    expiresIn: number;
+    expiresAt: string;
+};
 
 const VisitorInfo = ({ fullName,
     setFullName,
@@ -43,6 +48,7 @@ const VisitorInfo = ({ fullName,
 
 
   const { token } = useOutletContext<OutletContextType>();
+  const [planHref, setPlanHref] = useState<string | null>(null);
 
 
     const handleInfoCompletion = (e: React.FormEvent<HTMLFormElement>) => {
@@ -64,6 +70,37 @@ const VisitorInfo = ({ fullName,
     useEffect(()=> {
       console.log(visitorCategory);
     },[visitorCategory])
+
+    useEffect(() => {
+      let ignore = false;
+
+      const loadPlanUrl = async () => {
+        try {
+          const planUrlData = await fetchWithAuth<PlanUrlResponse>("/visitors/plan-url");
+
+          if (ignore || !planUrlData?.url) {
+            return;
+          }
+
+          const url = new URL(planUrlData.url, window.location.origin);
+
+          if (url.pathname.startsWith("/plan-du-site")) {
+            setPlanHref(`${url.pathname}${url.search}`);
+            return;
+          }
+
+          setPlanHref(`/plan-du-site/${token}?planUrl=${encodeURIComponent(planUrlData.url)}`);
+        } catch (error) {
+          console.error("Erreur chargement plan du site:", error);
+        }
+      };
+
+      loadPlanUrl();
+
+      return () => {
+        ignore = true;
+      };
+    }, [token]);
 
 
      
@@ -136,7 +173,11 @@ const VisitorInfo = ({ fullName,
             <p className=" text-[0.8em] ">(Vegibec inc. ne conservera pas votre addresse courriel.)</p>
       </div>  }
               
-       <Link to={`/plan-du-site/${token}`} target="_blank" className="text-[1.6em] font-bold text-secondary">Plan du site</Link>
+       {planHref ? (
+        <a href={planHref} target="_blank" rel="noreferrer" className="text-[1.6em] font-bold text-secondary">Plan du site</a>
+       ) : (
+        <span className="text-[1.6em] font-bold text-gray-400">Chargement du plan...</span>
+       )}
       
       
 

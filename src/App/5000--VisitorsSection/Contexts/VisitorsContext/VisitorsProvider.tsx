@@ -30,7 +30,7 @@ export const VisitorsProvider = ({ children }: Props) => {
   try {
     setStartVisitorSessionLoading(true);
 
-    console.log(payload);
+  
 
     let arrival_signature_key = payload.signatureDataUrl;
 

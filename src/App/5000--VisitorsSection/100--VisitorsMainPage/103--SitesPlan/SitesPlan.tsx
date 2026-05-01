@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
+import { useSearchParams } from 'react-router-dom'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
 
@@ -10,6 +10,9 @@ const normalizeSearch = (value: string) =>
     .toLowerCase();
 
 const SitesPlan = () => {
+  const [searchParams] = useSearchParams();
+  const planUrl = searchParams.get('planUrl');
+
   const [showDots, setShowDots] = useState<Record<string, boolean>>({
     '52': false,
     '53': false,
@@ -125,14 +128,19 @@ const SitesPlan = () => {
 
   return (
     <article className="flex flex-col items-center gap-6 pb-10">
+      {!planUrl && (
+        <p className="text-[1.6em] font-bold text-secondary text-center">
+          Lien du plan invalide ou expiré.
+        </p>
+      )}
 
-      <section className='flex flex-col items-center'>
+      {planUrl && <section className='flex flex-col items-center'>
         <div className='relative fade-image'>
-        <img className='' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
+        <img className='' src={planUrl} alt="Plan aérien du 171, rang ste-Sophie" />
           <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
-      </section>
-      <section className='flex flex-col items-center gap-4'>
+      </section>}
+      {planUrl && <section className='flex flex-col items-center gap-4'>
         <input
           type="text"
           value={searchInput}
@@ -149,7 +157,7 @@ const SitesPlan = () => {
             )
           })}
         </ul>}
-      </section>
+      </section>}
     </article>
   )
 }
