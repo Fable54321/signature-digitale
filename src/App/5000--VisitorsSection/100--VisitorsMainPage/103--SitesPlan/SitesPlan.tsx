@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
 import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
+import { handlePlanClick, type PlanClickPosition } from '../../Utils/handlePlanClick';
 
 const normalizeSearch = (value: string) =>
   value
@@ -89,6 +90,7 @@ const SitesPlan = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [pendingScrollSlug, setPendingScrollSlug] = useState<string | null>(null);
+  const [clickedPosition, setClickedPosition] = useState<PlanClickPosition | null>(null);
   
   useEffect(() => {
     if (!pendingScrollSlug || !showDots[pendingScrollSlug]) {
@@ -136,8 +138,14 @@ const SitesPlan = () => {
       )}
 
       {hasPlanToken && <section className='flex flex-col items-center'>
-        <div className='relative fade-image'>
-        <img className='' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
+        <div onClick={(e) => setClickedPosition(handlePlanClick(e))} className='relative fade-image cursor-crosshair'>
+        <img className='block w-full max-w-full' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
+          {clickedPosition && (
+            <div
+              className='absolute aspect-square w-[2%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-red-500'
+              style={{ left: clickedPosition.left, top: clickedPosition.top }}
+            />
+          )}
           <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
       </section>}
