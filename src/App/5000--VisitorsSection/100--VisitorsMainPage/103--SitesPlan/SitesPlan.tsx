@@ -216,7 +216,7 @@ const SitesPlan = () => {
   }, [searchInput, showDots]);
 
   return (
-    <article className="flex flex-col items-center gap-6 pb-10">
+    <article className="flex flex-col items-center gap-6 pb-10 overflow-x-hidden">
       {planAccessStatus === 'checking' && (
         <p className="text-[1.6em] font-bold text-secondary text-center">
           Validation du lien du plan...
