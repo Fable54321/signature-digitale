@@ -46,10 +46,10 @@ const VisitorInfo = ({ fullName,
     const handleInfoCompletion = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!fullName || !visitReason || !visitorCategory){
-            alert("Veuillez indiquez au moins le nom complet, la catégorie du visiteur et la raison de la visite.");
-            return;
-        }
+        // if (!fullName || !visitReason || !visitorCategory){
+        //     alert("Veuillez indiquez au moins le nom complet, la catégorie du visiteur et la raison de la visite.");
+        //     return;
+        // }
        
 
       

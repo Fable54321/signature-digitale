@@ -83,6 +83,8 @@ const ChecklistBox = () => {
 
           const url = new URL(planUrlData.url, window.location.origin);
 
+          console.log("Plan URL:", url.href);
+
           const appOrigin = window.location.origin;
 
           if (url.pathname.startsWith("/plan-du-site")) {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
 import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
@@ -11,8 +11,8 @@ const normalizeSearch = (value: string) =>
     .toLowerCase();
 
 const SitesPlan = () => {
-  const [searchParams] = useSearchParams();
-  const planUrl = searchParams.get('planUrl');
+  const { token } = useParams<{ token: string }>();
+  const hasPlanToken = Boolean(token);
 
   const [showDots, setShowDots] = useState<Record<string, boolean>>({
     '52': false,
@@ -129,19 +129,19 @@ const SitesPlan = () => {
 
   return (
     <article className="flex flex-col items-center gap-6 pb-10">
-      {!planUrl && (
+      {!hasPlanToken && (
         <p className="text-[1.6em] font-bold text-secondary text-center">
           Lien du plan invalide ou expiré.
         </p>
       )}
 
-      {planUrl && <section className='flex flex-col items-center'>
+      {hasPlanToken && <section className='flex flex-col items-center'>
         <div className='relative fade-image'>
         <img className='' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
           <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
       </section>}
-      {planUrl && <section className='flex flex-col items-center gap-4'>
+      {hasPlanToken && <section className='flex flex-col items-center gap-4'>
         <input
           type="text"
           value={searchInput}
