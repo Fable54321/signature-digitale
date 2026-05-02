@@ -10,12 +10,9 @@ const QRGenerator = ({ url }: Props) => {
 
 
 
-    // const handleSubmit = async (e: React.FormEvent) => {
-    
-    // };
 
 
-const appUrl = import.meta.env.VITE_APP_URL
+
 
 
     return (
@@ -26,7 +23,7 @@ const appUrl = import.meta.env.VITE_APP_URL
                         <div className=" flex flex-col gap-2 justify-center items-center flex-1">
                             
                             <QRCode
-                                value={`${appUrl}${url}`}
+                                value={`${url}`}
                                 size={150}
                             />
                          
