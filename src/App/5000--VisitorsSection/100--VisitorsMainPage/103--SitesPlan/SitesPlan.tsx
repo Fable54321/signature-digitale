@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
 import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
 import { gpsToPlanPosition } from '../../Utils/gpsToPlanPosition'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 
 const normalizeSearch = (value: string) =>
@@ -21,6 +23,7 @@ const calibrationPoints = [
 
 const SitesPlan = () => {
   const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
   const hasPlanToken = Boolean(token);
 
   const [showDots, setShowDots] = useState<Record<string, boolean>>({
@@ -102,6 +105,9 @@ const SitesPlan = () => {
   const [searchInput, setSearchInput] = useState('');
   const [pendingScrollSlug, setPendingScrollSlug] = useState<string | null>(null);
   const [userPosition, setUserPosition] = useState<{ left: number; top: number, accuracy: number } | null>(null);
+  const [planAccessStatus, setPlanAccessStatus] = useState<'checking' | 'allowed' | 'denied'>(
+    hasPlanToken ? 'checking' : 'denied',
+  );
 
   
   useEffect(() => {
@@ -126,9 +132,44 @@ const SitesPlan = () => {
       setPendingScrollSlug(slug);
     }
   };
+
+  useEffect(() => {
+    if (!token) {
+      setPlanAccessStatus('denied');
+      return;
+    }
+
+    const controller = new AbortController();
+    const planUrl = searchParams.get('planUrl');
+    const accessUrl = planUrl
+      ? new URL(planUrl, API_BASE_URL || window.location.origin).href
+      : `${API_BASE_URL}/visitors/plan-access?token=${encodeURIComponent(token)}`;
+
+    setPlanAccessStatus('checking');
+
+    fetch(accessUrl, {
+      method: 'GET',
+      signal: controller.signal,
+    })
+      .then((response) => {
+        setPlanAccessStatus(response.ok ? 'allowed' : 'denied');
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        console.error('Erreur validation du lien du plan:', error);
+        setPlanAccessStatus('denied');
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [searchParams, token]);
  
  useEffect(() => {
-  if (!hasPlanToken) return;
+  if (planAccessStatus !== 'allowed') return;
 
   if (!navigator.geolocation) {
     console.error("Geolocation is not supported.");
@@ -160,7 +201,7 @@ const SitesPlan = () => {
   return () => {
     navigator.geolocation.clearWatch(watchId);
   };
-}, [hasPlanToken]);
+}, [planAccessStatus]);
 
   const filteredBuildings = useMemo(() => {
     const search = normalizeSearch(searchInput);
@@ -176,13 +217,19 @@ const SitesPlan = () => {
 
   return (
     <article className="flex flex-col items-center gap-6 pb-10">
-      {!hasPlanToken && (
+      {planAccessStatus === 'checking' && (
+        <p className="text-[1.6em] font-bold text-secondary text-center">
+          Validation du lien du plan...
+        </p>
+      )}
+
+      {planAccessStatus === 'denied' && (
         <p className="text-[1.6em] font-bold text-secondary text-center">
           Lien du plan invalide ou expiré.
         </p>
       )}
 
-      {hasPlanToken && <section className='flex flex-col items-center'>
+      {planAccessStatus === 'allowed' && <section className='flex flex-col items-center'>
         <div  className='relative fade-image'>
         <img className='block w-full max-w-full' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
         {userPosition && (
@@ -198,7 +245,7 @@ const SitesPlan = () => {
           <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
       </section>}
-      {hasPlanToken && <section className='flex flex-col items-center gap-4'>
+      {planAccessStatus === 'allowed' && <section className='flex flex-col items-center gap-4'>
         <input
           type="text"
           value={searchInput}
