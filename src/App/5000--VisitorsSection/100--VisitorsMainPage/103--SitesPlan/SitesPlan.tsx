@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import GreenDots from './GreenDots'
 import buildingsList from '../../assets/data/buildingsList'
 import plan from '../../assets/images/1777456864065-7231d062-1073-44d2-a4d6-6d346233fa41_1_upscayl_4x_upscayl-standard-4x.png'
+import { gpsToPlanPosition } from '../../Utils/gpsToPlanPosition'
 
 
 const normalizeSearch = (value: string) =>
@@ -10,6 +11,13 @@ const normalizeSearch = (value: string) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
+
+const calibrationPoints = [
+  { lat: 45.51480, lng: -74.06292, x: 41.10236, y: 83.1740 },
+  { lat: 45.51472, lng: -74.06192, x: 53.3858, y: 68.8188 },
+  { lat: 45.51526, lng: -74.06042, x: 61.2073, y: 35.6357 },
+  { lat: 45.51554, lng: -74.06466, x: 9.3963, y: 93.9946 },
+];    
 
 const SitesPlan = () => {
   const { token } = useParams<{ token: string }>();
@@ -86,10 +94,14 @@ const SitesPlan = () => {
     '48': false
   })
 
+
+
+
   const dotRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const [searchInput, setSearchInput] = useState('');
   const [pendingScrollSlug, setPendingScrollSlug] = useState<string | null>(null);
+  const [userPosition, setUserPosition] = useState<{ left: number; top: number, accuracy: number } | null>(null);
 
   
   useEffect(() => {
@@ -115,7 +127,40 @@ const SitesPlan = () => {
     }
   };
  
-  
+ useEffect(() => {
+  if (!hasPlanToken) return;
+
+  if (!navigator.geolocation) {
+    console.error("Geolocation is not supported.");
+    return;
+  }
+
+  const watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const { latitude, longitude, accuracy } = position.coords;
+
+      const dot = gpsToPlanPosition(latitude, longitude, calibrationPoints);
+
+      setUserPosition({
+        left: dot.x,
+        top: dot.y,
+        accuracy,
+      });
+    },
+    (error) => {
+      console.error("GPS error:", error);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 10000,
+    }
+  );
+
+  return () => {
+    navigator.geolocation.clearWatch(watchId);
+  };
+}, [hasPlanToken]);
 
   const filteredBuildings = useMemo(() => {
     const search = normalizeSearch(searchInput);
@@ -138,9 +183,18 @@ const SitesPlan = () => {
       )}
 
       {hasPlanToken && <section className='flex flex-col items-center'>
-        <div  className='relative fade-image cursor-crosshair'>
+        <div  className='relative fade-image'>
         <img className='block w-full max-w-full' src={plan} alt="Plan aérien du 171, rang ste-Sophie" />
-       
+        {userPosition && (
+  <div
+    className="absolute h-4 w-4 rounded-full bg-blue-500 border-2 border-white"
+    style={{
+      left: `${userPosition.left}%`,
+      top: `${userPosition.top}%`,
+      transform: "translate(-50%, -50%)",
+    }}
+  />
+)}
           <GreenDots showDots={showDots} dotRefs={dotRefs} />
         </div>
       </section>}
