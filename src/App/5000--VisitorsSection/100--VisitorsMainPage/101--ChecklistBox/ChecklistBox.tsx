@@ -83,12 +83,14 @@ const ChecklistBox = () => {
 
           const url = new URL(planUrlData.url, window.location.origin);
 
+          const appOrigin = window.location.origin;
+
           if (url.pathname.startsWith("/plan-du-site")) {
-            setPlanHref(`${url.pathname}${url.search}`);
+            setPlanHref(`${appOrigin}${url.pathname}${url.search}`);
             return;
           }
 
-          setPlanHref(`/plan-du-site/${token}?planUrl=${encodeURIComponent(planUrlData.url)}`);
+          setPlanHref(`${appOrigin}/plan-du-site/${token}?planUrl=${encodeURIComponent(planUrlData.url)}`);
         } catch (error) {
           console.error("Erreur chargement plan du site:", error);
         }
