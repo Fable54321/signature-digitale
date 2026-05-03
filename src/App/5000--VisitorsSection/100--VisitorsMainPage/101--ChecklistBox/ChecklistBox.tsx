@@ -5,6 +5,7 @@ import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
+import Spinner from "../../../../Components/Spinner";
 
 
 
@@ -28,7 +29,7 @@ const ChecklistBox = () => {
     
     });
 
-    const { startVisitorSession } = useVisitors();
+    const { startVisitorSession, startVisitorSessionLoading } = useVisitors();
 
 
 
@@ -67,6 +68,8 @@ const ChecklistBox = () => {
     },[currentDate]);
 
 const [planHref, setPlanHref] = useState<string | null>(null);
+
+const shouldShowVisitorFlow = Boolean(planHref) && !startVisitorSessionLoading ;
 
 useEffect(() => {
   let ignore = false;
@@ -135,7 +138,11 @@ const handleSubmit = async (signatureDataUrl: string) => {
         isInfoCompleted ? "Politique pour les visiteurs" : "Informations du visiteur" 
        
         }</h2>
-     {!isInfoCompleted && planHref && <VisitorInfo 
+
+        {startVisitorSessionLoading && <Spinner />}
+
+
+     {shouldShowVisitorFlow && !isInfoCompleted && <VisitorInfo 
      fullName={fullName} 
      currentDate={currentDate} 
      setFullName={setFullName} 
@@ -149,6 +156,7 @@ const handleSubmit = async (signatureDataUrl: string) => {
      visitorCategory={visitorCategory}
      setVisitorCategory={setVisitorCategory}
      url={planHref} />} 
+      {shouldShowVisitorFlow && (
          <form action="" className="px-4">
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.2em] mt-2">
@@ -214,6 +222,7 @@ const handleSubmit = async (signatureDataUrl: string) => {
 </div>}
 
       </form>
+      )}
     </section>
   )
 }
