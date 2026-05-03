@@ -31,7 +31,7 @@ const ChecklistBox = () => {
     const { startVisitorSession } = useVisitors();
 
 
-  const [planHref, setPlanHref] = useState<string | null>(null);
+
 
     const [fullName, setFullName] = useState("");
     const [companyName, setCompanyName] = useState("");
@@ -66,14 +66,16 @@ const ChecklistBox = () => {
       }, 1000);
     },[currentDate]);
 
+const [planHref, setPlanHref] = useState<string | null>(null);
+
 useEffect(() => {
   let ignore = false;
 
   const fetchVisitorPlanUrl = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/plan/plan-url`,
-      );
+      const response = await fetch(`${API_BASE_URL}/visitors/plan-url`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("Impossible de générer le lien du plan.");
@@ -82,7 +84,6 @@ useEffect(() => {
       const data = await response.json();
 
       if (!ignore && data?.url) {
-        console.log("Plan URL:", data.url);
         setPlanHref(data.url);
       }
     } catch (error) {
@@ -96,7 +97,6 @@ useEffect(() => {
     ignore = true;
   };
 }, [API_BASE_URL]);
-
 
     
 
@@ -135,7 +135,7 @@ const handleSubmit = async (signatureDataUrl: string) => {
         isInfoCompleted ? "Politique pour les visiteurs" : "Informations du visiteur" 
        
         }</h2>
-     {!isInfoCompleted && <VisitorInfo 
+     {!isInfoCompleted && planHref && <VisitorInfo 
      fullName={fullName} 
      currentDate={currentDate} 
      setFullName={setFullName} 
