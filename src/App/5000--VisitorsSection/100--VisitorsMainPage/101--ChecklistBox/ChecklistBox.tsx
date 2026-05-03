@@ -5,19 +5,15 @@ import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
-import { useOutletContext } from "react-router-dom";
-import { fetchWithAuth } from "../../Utils/fetchWithAuth";
+
+
 
 
 type ChecklistKey = keyof typeof rules;
 type ChecklistState = Record<ChecklistKey, boolean>;
 
-type OutletContextType = { token: string };
-type PlanUrlResponse = {
-    url: string;
-    expiresIn: number;
-    expiresAt: string;
-};
+
+
 
 const ChecklistBox = () => {
 
@@ -34,7 +30,7 @@ const ChecklistBox = () => {
 
     const { startVisitorSession } = useVisitors();
 
-     const { token } = useOutletContext<OutletContextType>();
+
   const [planHref, setPlanHref] = useState<string | null>(null);
 
     const [fullName, setFullName] = useState("");
@@ -54,6 +50,8 @@ const ChecklistBox = () => {
       return Object.values(checklist).every((value) => value);
     }, [checklist]);
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
     useEffect(()=> { console.log(isAllChecked) },[isAllChecked, checklist])
 
     useEffect(()=> {
@@ -68,42 +66,40 @@ const ChecklistBox = () => {
       }, 1000);
     },[currentDate]);
 
+useEffect(() => {
+  let ignore = false;
+
+  const fetchVisitorPlanUrl = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/plan/plan-url`,
+      );
+
+      if (!response.ok) {
+        throw new Error("Impossible de générer le lien du plan.");
+      }
+
+      const data = await response.json();
+
+      if (!ignore && data?.url) {
+        console.log("Plan URL:", data.url);
+        setPlanHref(data.url);
+      }
+    } catch (error) {
+      console.error("Erreur chargement plan du site:", error);
+    }
+  };
+
+  fetchVisitorPlanUrl();
+
+  return () => {
+    ignore = true;
+  };
+}, [API_BASE_URL]);
+
 
     
-    useEffect(() => {
-      let ignore = false;
 
-      const loadPlanUrl = async () => {
-        try {
-          const planUrlData = await fetchWithAuth<PlanUrlResponse>("/visitors/plan-url");
-
-          if (ignore || !planUrlData?.url) {
-            return;
-          }
-
-          const url = new URL(planUrlData.url, window.location.origin);
-
-          console.log("Plan URL:", url.href);
-
-          const appOrigin = window.location.origin;
-
-          if (url.pathname.startsWith("/plan-du-site")) {
-            setPlanHref(`${appOrigin}${url.pathname}${url.search}`);
-            return;
-          }
-
-          setPlanHref(`${appOrigin}/plan-du-site/${token}?planUrl=${encodeURIComponent(planUrlData.url)}`);
-        } catch (error) {
-          console.error("Erreur chargement plan du site:", error);
-        }
-      };
-
-      loadPlanUrl();
-
-      return () => {
-        ignore = true;
-      };
-    }, [token]);
 
 
 
