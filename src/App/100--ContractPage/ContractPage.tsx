@@ -26,49 +26,66 @@ const ContractPage = () => {
     pdfLoading,
     currentContract,
     contracts,
+    currentIndex,
+    setCurrentIndex,
     isPinError,
     pin,
   } = useForeignWorker();
 
+  const navigate = useNavigate();
+
   const [numPages, setNumPages] = useState<number>(0);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
-  const [signedName] = useState<string>("");
   const [, setIsSuccess] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [isIdentityConfirmed, setIsIdentityConfirmed] = useState<boolean>(false);
 
-  const onLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-  }, []);
+  const signedName = useMemo(() => {
+    if (!worker) return "";
+    return `${worker.name ?? ""} ${worker.surname ?? ""}`.trim();
+  }, [worker]);
 
   const isLoading = useMemo(() => {
     return loading || pdfLoading;
   }, [loading, pdfLoading]);
 
+  const isLastContract = useMemo(() => {
+    return contracts.length > 0 && currentIndex === contracts.length - 1;
+  }, [contracts.length, currentIndex]);
+
   const isAllSigned = useMemo(() => {
     return contracts.length > 0 && contracts.every((contract) => contract.status === "signed");
   }, [contracts]);
+
+  const onLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+  }, []);
+
+  const handleNextContract = () => {
+    if (!acceptedTerms) return;
+
+    setAcceptedTerms(false);
+    setCurrentIndex((prev) => Math.min(prev + 1, contracts.length - 1));
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     void generateContractPdf();
   }, [generateContractPdf]);
 
- useEffect(() => {
-   if(acceptedTerms) scrollToBottom();
+  useEffect(() => {
+    if (acceptedTerms) scrollToBottom();
   }, [acceptedTerms]);
 
-
-const navigate = useNavigate();
-
-useEffect(()=> {
-  if(!pin || pin.length === 0) {
-
-    void navigate("/");
-
-  }
-},[navigate, pin]);
-
-
+  useEffect(() => {
+    if (!pin || pin.length === 0) {
+      void navigate("/");
+    }
+  }, [navigate, pin]);
 
   useEffect(() => {
     if (!isAllSigned) return;
@@ -77,18 +94,15 @@ useEffect(()=> {
     setIsSuccess(false);
 
     const timeout = setTimeout(() => {
-      setIsDone(false);
-      void disconnect();
-    }, 1800);
+      window.location.replace("/");
+    }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [isAllSigned, disconnect]);
+  }, [isAllSigned]);
 
   useEffect(() => {
     setAcceptedTerms(false);
   }, [currentContract?.contractId]);
-
-
 
   useEffect(() => {
     setNumPages(0);
@@ -132,6 +146,10 @@ useEffect(()=> {
               Contrato de trabajo
             </h2>
 
+            <p className="text-center text-[1.2em]">
+              Contrato {currentIndex + 1} de {contracts.length}
+            </p>
+
             {pdfUrl && (
               <div className="flex justify-center">
                 <Document
@@ -174,15 +192,25 @@ useEffect(()=> {
               type="checkbox"
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-
             />
             <span className="text-[0.7em] font-light">(Marcar la casilla)</span>
-            Confirmo que he leído y comprendido la información anterior.
+            {isLastContract
+  ? "Confirmo que he leído y comprendido todos los contratos y acepto firmarlos."
+  : "Confirmo que he leído y comprendido la información anterior."}
           </label>
 
-          {acceptedTerms && (
+          {!isLastContract && acceptedTerms && (
+            <button
+              onClick={handleNextContract}
+              disabled={pdfLoading}
+              className="button-generic text-[1.5em] mt-8 w-[min(90%,500px)]"
+            >
+              Siguiente contrato
+            </button>
+          )}
+
+          {isLastContract && acceptedTerms && (
             <SignatureBlock
-              contractId={currentContract.contractId}
               acceptedTerms={acceptedTerms}
               signedName={signedName}
               setAcceptedTerms={setAcceptedTerms}

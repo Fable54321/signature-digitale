@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createContext,
   useCallback,
@@ -30,14 +31,14 @@ type SessionContract = {
   reused: boolean;
 };
 
-type SignContractParams = {
-  contractId: number;
+type SaveSessionSignatureParams = {
   signatureDataUrl: string;
+};
+
+type SignAllContractsParams = {
   acceptedTerms: boolean;
   signedName: string;
 };
-
-type SignContract = (params: SignContractParams) => Promise<boolean>;
 
 type ForeignWorkerContextType = {
   pin: string;
@@ -53,7 +54,7 @@ type ForeignWorkerContextType = {
   clearWorker: () => void;
   clearPdf: () => void;
   disconnect: (pinToUse?: string) => Promise<boolean>;
-  signContract: SignContract;
+  signAllContracts: (params: SignAllContractsParams) => Promise<boolean>;
   setError: React.Dispatch<React.SetStateAction<string>>;
   isPinError: boolean;
   contracts: SessionContract[];
@@ -62,6 +63,9 @@ type ForeignWorkerContextType = {
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   currentContract: SessionContract | null;
   currentContractId: number;
+  sessionSignatureDataUrl: string | null;
+  setSessionSignatureDataUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  saveSessionSignature: (params: SaveSessionSignatureParams) => Promise<boolean>;
 };
 
 const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>(
@@ -70,11 +74,7 @@ const ForeignWorkerContext = createContext<ForeignWorkerContextType | undefined>
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
-export const ForeignWorkerProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const ForeignWorkerProvider = ({ children }: { children: ReactNode }) => {
   const [pin, setPin] = useState("");
   const [isPinError, setIsPinError] = useState(false);
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -84,6 +84,7 @@ export const ForeignWorkerProvider = ({
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [contracts, setContracts] = useState<SessionContract[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [sessionSignatureDataUrl, setSessionSignatureDataUrl] = useState<string | null>(null);
 
   const contractsRef = useRef<SessionContract[]>([]);
   const blobUrlsRef = useRef<Map<number, string>>(new Map());
@@ -113,6 +114,7 @@ export const ForeignWorkerProvider = ({
 
   const revokeBlobUrl = useCallback((contractId: number) => {
     const existing = blobUrlsRef.current.get(contractId);
+
     if (existing) {
       URL.revokeObjectURL(existing);
       blobUrlsRef.current.delete(contractId);
@@ -146,18 +148,11 @@ export const ForeignWorkerProvider = ({
         (contract) => contract.contractId === contractId
       );
 
-      if (!existingContract) {
-        return null;
-      }
-
-      if (existingContract.accessUrl) {
-        return existingContract.accessUrl;
-      }
+      if (!existingContract) return null;
+      if (existingContract.accessUrl) return existingContract.accessUrl;
 
       const inFlightRequest = accessRequestsRef.current.get(contractId);
-      if (inFlightRequest) {
-        return inFlightRequest;
-      }
+      if (inFlightRequest) return inFlightRequest;
 
       const requestPromise = (async () => {
         try {
@@ -191,22 +186,15 @@ export const ForeignWorkerProvider = ({
   const ensureContractBlobUrl = useCallback(
     async (contractId: number): Promise<string | null> => {
       const existingBlobUrl = blobUrlsRef.current.get(contractId);
-      if (existingBlobUrl) {
-        return existingBlobUrl;
-      }
+      if (existingBlobUrl) return existingBlobUrl;
 
       const inFlightRequest = blobRequestsRef.current.get(contractId);
-      if (inFlightRequest) {
-        return inFlightRequest;
-      }
+      if (inFlightRequest) return inFlightRequest;
 
       const requestPromise = (async () => {
         try {
           const accessUrl = await ensureContractAccess(contractId);
-
-          if (!accessUrl) {
-            return null;
-          }
+          if (!accessUrl) return null;
 
           const response = await fetch(accessUrl);
 
@@ -243,6 +231,7 @@ export const ForeignWorkerProvider = ({
       activeDisplayedContractRef.current = contractId;
 
       const existingBlobUrl = blobUrlsRef.current.get(contractId);
+
       if (existingBlobUrl) {
         if (activeDisplayedContractRef.current === contractId) {
           setPdfUrl(existingBlobUrl);
@@ -262,10 +251,7 @@ export const ForeignWorkerProvider = ({
 
       const downloadedBlobUrl = await ensureContractBlobUrl(contractId);
 
-      if (
-        downloadedBlobUrl &&
-        activeDisplayedContractRef.current === contractId
-      ) {
+      if (downloadedBlobUrl && activeDisplayedContractRef.current === contractId) {
         setPdfUrl(downloadedBlobUrl);
       }
     },
@@ -308,6 +294,7 @@ export const ForeignWorkerProvider = ({
     setContracts([]);
     setCurrentIndex(0);
     setPdfUrl(null);
+    setSessionSignatureDataUrl(null);
     activeDisplayedContractRef.current = null;
 
     accessRequestsRef.current.clear();
@@ -316,6 +303,7 @@ export const ForeignWorkerProvider = ({
     for (const blobUrl of blobUrlsRef.current.values()) {
       URL.revokeObjectURL(blobUrl);
     }
+
     blobUrlsRef.current.clear();
   }, []);
 
@@ -380,7 +368,6 @@ export const ForeignWorkerProvider = ({
         });
 
         return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err.response?.data?.error || "Erreur lors de la connexion");
         setIsPinError(true);
@@ -451,7 +438,6 @@ export const ForeignWorkerProvider = ({
         );
 
         return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error("Erreur lors de la préparation des contrats:", err);
         setError(
@@ -467,78 +453,116 @@ export const ForeignWorkerProvider = ({
 
   const generateContractPdf = startContractSession;
 
- const signContract = useCallback<SignContract>(
-  async ({
-    contractId,
-    signatureDataUrl,
-    acceptedTerms,
-    signedName,
-  }) => {
-    if (!contractId) {
-      setError("Contrat introuvable");
-      return false;
-    }
-
-    if (!acceptedTerms) {
-      setError("Vous devez accepter le contrat avant de signer");
-      return false;
-    }
-
-    if (!signatureDataUrl) {
-      setError("Veuillez ajouter votre signature");
-      return false;
-    }
-
-    try {
-      setPdfLoading(true);
-      setError("");
-
-      await axios.post(
-        `${baseUrl}/signature/foreign-worker-contract/${contractId}/sign`,
-        {
-          signatureDataUrl,
-          acceptedTerms,
-          signedName,
-        }
-      );
-
-      const currentContracts = contractsRef.current;
-
-      const updatedContracts = currentContracts.map((contract) =>
-        contract.contractId === contractId
-          ? {
-              ...contract,
-              status: "signed" as const,
-              accessUrl: null,
-            }
-          : contract
-      );
-
-      const nextUnsignedIndex = updatedContracts.findIndex(
-        (contract) => contract.status !== "signed"
-      );
-
-      setContracts(updatedContracts);
-
-      revokeBlobUrl(contractId);
-
-      if (nextUnsignedIndex >= 0) {
-        setCurrentIndex(nextUnsignedIndex);
-      } else {
-        setPdfUrl(null);
+  const saveSessionSignature = useCallback(
+    async ({ signatureDataUrl }: SaveSessionSignatureParams) => {
+      if (!pin) {
+        setError("PIN manquant");
+        return false;
       }
 
-      return true;
-    } catch (err) {
-      console.error("Erreur lors de la signature du contrat:", err);
-      setError("Erreur lors de la signature du contrat");
-      return false;
-    } finally {
-      setPdfLoading(false);
-    }
-  },
-  [revokeBlobUrl]
-);
+      if (!signatureDataUrl) {
+        setError("Veuillez ajouter votre signature");
+        return false;
+      }
+
+      try {
+        setPdfLoading(true);
+        setError("");
+
+        const res = await axios.post(
+          `${baseUrl}/signature/foreign-worker-contract/session/by-pin`,
+          {
+            pin,
+            signatureDataUrl,
+          }
+        );
+
+        const { contracts: sessionContracts } = res.data;
+
+        if (Array.isArray(sessionContracts) && sessionContracts.length > 0) {
+          setContracts(sessionContracts);
+        }
+
+        setSessionSignatureDataUrl(signatureDataUrl);
+        return true;
+      } catch (err) {
+        console.error("Erreur lors de l'enregistrement de la signature:", err);
+        setError("Erreur lors de l'enregistrement de la signature");
+        return false;
+      } finally {
+        setPdfLoading(false);
+      }
+    },
+    [pin]
+  );
+
+  const signAllContracts = useCallback(
+    async ({ acceptedTerms, signedName }: SignAllContractsParams) => {
+      if (!pin) {
+        setError("PIN manquant");
+        return false;
+      }
+
+      if (!acceptedTerms) {
+        setError("Veuillez accepter les conditions");
+        return false;
+      }
+
+      if (!signedName.trim()) {
+        setError("Veuillez entrer votre nom");
+        return false;
+      }
+
+      try {
+        setPdfLoading(true);
+        setError("");
+
+        const res = await axios.post(
+          `${baseUrl}/signature/foreign-worker-contract/session/sign-all/by-pin`,
+          {
+            pin,
+            acceptedTerms,
+            signedName,
+          }
+        );
+
+        const signedContracts = res.data?.contracts;
+
+        if (Array.isArray(signedContracts) && signedContracts.length > 0) {
+          setContracts(signedContracts);
+        } else {
+          setContracts((prev) =>
+            prev.map((contract) => ({
+              ...contract,
+              status: "signed",
+              accessUrl: null,
+            }))
+          );
+        }
+
+        for (const contract of contractsRef.current) {
+          revokeBlobUrl(contract.contractId);
+        }
+
+        accessRequestsRef.current.clear();
+        blobRequestsRef.current.clear();
+
+        setCurrentIndex(contractsRef.current.length - 1);
+        setPdfUrl(null);
+
+        return true;
+      } catch (err: any) {
+        console.error("Erreur lors de la signature des contrats:", err);
+        setError(
+          err.response?.data?.error || "Erreur lors de la signature des contrats"
+        );
+        return false;
+      } finally {
+        setPdfLoading(false);
+      }
+    },
+    [pin, revokeBlobUrl]
+  );
 
   useEffect(() => {
     const accessRequests = accessRequestsRef.current;
@@ -552,6 +576,7 @@ export const ForeignWorkerProvider = ({
       for (const url of blobUrls.values()) {
         URL.revokeObjectURL(url);
       }
+
       blobUrls.clear();
     };
   }, []);
@@ -571,7 +596,7 @@ export const ForeignWorkerProvider = ({
       clearWorker,
       clearPdf,
       disconnect,
-      signContract,
+      signAllContracts,
       setError,
       isPinError,
       contracts,
@@ -580,6 +605,9 @@ export const ForeignWorkerProvider = ({
       setCurrentIndex,
       currentContract,
       currentContractId,
+      sessionSignatureDataUrl,
+      setSessionSignatureDataUrl,
+      saveSessionSignature,
     }),
     [
       pin,
@@ -594,12 +622,14 @@ export const ForeignWorkerProvider = ({
       clearWorker,
       clearPdf,
       disconnect,
-      signContract,
+      signAllContracts,
       isPinError,
       contracts,
       currentIndex,
       currentContract,
       currentContractId,
+      sessionSignatureDataUrl,
+      saveSessionSignature,
     ]
   );
 
@@ -615,9 +645,7 @@ export const useForeignWorker = () => {
   const context = useContext(ForeignWorkerContext);
 
   if (!context) {
-    throw new Error(
-      "useForeignWorker must be used within a ForeignWorkerProvider"
-    );
+    throw new Error("useForeignWorker must be used within a ForeignWorkerProvider");
   }
 
   return context;

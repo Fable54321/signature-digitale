@@ -3,7 +3,6 @@ import SignatureCanvas from "react-signature-canvas";
 import { useForeignWorker } from "../Contexts/ForeignWorkerContext";
 
 type SignatureBlockProps = {
-  contractId: number;
   acceptedTerms: boolean;
   setAcceptedTerms: React.Dispatch<React.SetStateAction<boolean>>;
   signedName: string;
@@ -11,7 +10,6 @@ type SignatureBlockProps = {
 };
 
 const SignatureBlock = ({
-  contractId,
   acceptedTerms,
   signedName,
   setAcceptedTerms,
@@ -19,29 +17,53 @@ const SignatureBlock = ({
 }: SignatureBlockProps) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
 
-  const { signContract, pdfLoading, setError, error } = useForeignWorker();
+  const {
+    signAllContracts,
+    saveSessionSignature,
+    sessionSignatureDataUrl,
+    pdfLoading,
+    setError,
+    error,
+  } = useForeignWorker();
 
   const clear = () => {
-    if (!sigCanvas.current) return;
-    sigCanvas.current.clear();
+    sigCanvas.current?.clear();
   };
 
   const handleValidate = async () => {
-    if (!sigCanvas.current) {
-      setError("Zone de signature introuvable");
+    if (!acceptedTerms) {
+      setError("Debe aceptar las condiciones");
       return;
     }
 
-    if (sigCanvas.current.isEmpty()) {
-      setError("Por favor agregue su firma");
+    if (!signedName.trim()) {
+      setError("Debe ingresar su nombre");
       return;
     }
 
-    const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
+    let signatureSaved = true;
 
-    const success = await signContract({
-      contractId,
-      signatureDataUrl,
+    if (!sessionSignatureDataUrl) {
+      if (!sigCanvas.current) {
+        setError("Zone de signature introuvable");
+        return;
+      }
+
+      if (sigCanvas.current.isEmpty()) {
+        setError("Por favor agregue su firma");
+        return;
+      }
+
+      const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
+
+      signatureSaved = await saveSessionSignature({
+        signatureDataUrl,
+      });
+    }
+
+    if (!signatureSaved) return;
+
+    const success = await signAllContracts({
       acceptedTerms,
       signedName,
     });
@@ -49,7 +71,7 @@ const SignatureBlock = ({
     if (success) {
       setAcceptedTerms(false);
       setIsSuccess(true);
-      sigCanvas.current.clear();
+      sigCanvas.current?.clear();
 
       setTimeout(() => {
         setIsSuccess(false);
@@ -58,20 +80,28 @@ const SignatureBlock = ({
   };
 
   return (
-
     <section className="flex flex-col gap-2 mb-100">
       {error && <p className="text-red-600">{error}</p>}
-      <div className="bg-white border-2 border-black my-40">
-        <SignatureCanvas
-          ref={sigCanvas}
-          penColor="black"
-          canvasProps={{
-            width: 800,
-            height: 120,
-            className: "sigCanvas w-full",
-          }}
-        />
-      </div>
+
+      {!sessionSignatureDataUrl && (
+        <div className="bg-white border-2 border-black my-40">
+          <SignatureCanvas
+            ref={sigCanvas}
+            penColor="black"
+            canvasProps={{
+              width: 800,
+              height: 120,
+              className: "sigCanvas w-full",
+            }}
+          />
+        </div>
+      )}
+
+      {sessionSignatureDataUrl && (
+        <p className="text-green-600 text-center">
+          Firma guardada — confirme todos los contratos
+        </p>
+      )}
 
       <div className="flex w-full justify-center gap-2">
         <button
@@ -79,17 +109,19 @@ const SignatureBlock = ({
           disabled={pdfLoading}
           className="button-generic text-[1.5em] flex-1"
         >
-          Valider
+          Confirmar y firmar
         </button>
 
-        <button
-          onClick={clear}
-          type="button"
-          disabled={pdfLoading}
-          className="text-[1.5em] button-generic-red flex-1"
-        >
-          Borrar
-        </button>
+        {!sessionSignatureDataUrl && (
+          <button
+            onClick={clear}
+            type="button"
+            disabled={pdfLoading}
+            className="text-[1.5em] button-generic-red flex-1"
+          >
+            Borrar
+          </button>
+        )}
       </div>
     </section>
   );
