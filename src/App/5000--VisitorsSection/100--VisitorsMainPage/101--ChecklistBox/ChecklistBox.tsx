@@ -128,10 +128,17 @@ const handleSubmit = async (signatureDataUrl: string) => {
 
   await startVisitorSession(payload);
 };
+
+if(startVisitorSessionLoading){
+  return (
+    <Spinner />
+  )
+}
    
 
 
   return (
+
     <section className="border border-gray-200 mt-4 w-[min(98%,700px)] py-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
       
         <h2 className="w-full text-center text-[1.8em] border-b pb-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)]  border-primary">{
@@ -139,7 +146,7 @@ const handleSubmit = async (signatureDataUrl: string) => {
        
         }</h2>
 
-        {startVisitorSessionLoading && <Spinner />}
+       
 
 
      {shouldShowVisitorFlow && !isInfoCompleted && <VisitorInfo 
@@ -224,6 +231,7 @@ const handleSubmit = async (signatureDataUrl: string) => {
       </form>
       )}
     </section>
+  
   )
 }
 
