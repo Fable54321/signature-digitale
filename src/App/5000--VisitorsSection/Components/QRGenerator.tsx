@@ -16,15 +16,15 @@ const QRGenerator = ({ url }: Props) => {
 
 
     return (
-        <article className="w-full space-y-6">
+        <article className="w-full space-y6 flex flex-col gap-2 justify-center items-center ">
           
 
                         {/* QR block */}
-                        <div className=" flex flex-col gap-2 justify-center items-center flex-1">
+                        <div className=" p-4 rounded-xl bg-[#e5ebd5] w-fit">
                             
                             <QRCode
                                 value={`${url}`}
-                                size={150}
+                                size={200}
                             />
                          
                         </div>

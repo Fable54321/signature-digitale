@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { rules } from "../../Utils/Rules";
-import { Check } from "lucide-react";
+import { Check, UserRound } from "lucide-react";
 import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
@@ -139,13 +139,19 @@ if(startVisitorSessionLoading){
 
   return (
 
-    <section className="border border-gray-200 mt-4 w-[min(98%,700px)] py-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
+    <section className="border bg-white border-gray-200 mt-4 w-[min(98%,700px)] py-2 px-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
       
-        <h2 className="w-full text-center text-[1.8em] border-b pb-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)]  border-primary">{
+      <div className=" flex items-center gap-5 bg-[#f4f6ee] rounded-xl">
+        <div className="bg-secondary p-1 rounded-full">
+        <UserRound className="w-full text-tertiary" size={35} />
+        </div>
+        <h2 className="w-full text-[1.8em] font-primary text-secondary font-bold  pb-2 pt-2  border-primary">
+          
+          {
         isInfoCompleted ? "Politique pour les visiteurs" : "Informations du visiteur" 
        
         }</h2>
-
+      </div>
        
 
 
