@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { rules } from "../../Utils/Rules";
 import { Check, UserRound } from "lucide-react";
-import { scrollToBottom } from "../../../../Utils/scrollToBottom";
+import { scrollToBottom, scrollToTop } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
@@ -46,6 +46,15 @@ const ChecklistBox = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const [isInfoCompleted, setIsInfoCompleted] = useState(false);
+
+
+useEffect(() => {
+  if(isInfoCompleted) {
+    scrollToTop();
+  }
+},[isInfoCompleted])
+
+
 
     const isAllChecked = useMemo(() => {
       return Object.values(checklist).every((value) => value);
