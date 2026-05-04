@@ -139,7 +139,7 @@ if(startVisitorSessionLoading){
 
   return (
 
-    <section className="border bg-white border-gray-200 mt-4 w-[min(98%,700px)] py-2 px-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
+    <section className="border bg-white border-gray-200 mt-4 w-[min(98%,800px)] py-2 px-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
       
       <div className=" flex items-center gap-5 bg-[#f4f6ee] rounded-xl">
         <div className="bg-secondary p-1 rounded-full">

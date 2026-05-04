@@ -111,7 +111,7 @@ const VisitorInfo = ({ fullName,
 </div>
 
         <select
-          className="mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
+          className="mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em] "
           name="visitorCategory"
           id="visitorCategory"
           value={visitorCategory}
