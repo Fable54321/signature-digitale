@@ -44,6 +44,7 @@ const ChecklistBox = () => {
     const [isUnderstandingChecked, setIsUnderstandingChecked] = useState(false);
     const [otherContent, setOtherContent] = useState("");
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [isAllcheckedError, setIsAllCheckedError] = useState(false);
 
     const [isInfoCompleted, setIsInfoCompleted] = useState(false);
 
@@ -117,10 +118,11 @@ useEffect(() => {
 
 const handleSubmit = async (signatureDataUrl: string) => {
 
-  // if(!isAllChecked){
-  //   alert("Veuillez lire et accepter tous les termes.");
-  //   return;
-  // }
+  if(!isAllChecked){
+    setIsAllCheckedError(true);
+    scrollToTop();
+    return;
+  }
 
 
  const payload = {
@@ -183,6 +185,7 @@ if(startVisitorSessionLoading){
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.3em] mt-2">
           <p className="text-center text-[1.2em] font-bold text-secondary ">J'accepte les conditions suivantes :</p>
+          {isAllcheckedError && <p className="text-red-500 text-center text-[1em]">Veuillez accepter toutes les conditions pour continuer.</p>}
         {(Object.entries(checklist) as Array<[ChecklistKey, boolean]>).map(([key, value]) => (
           <div key={key} className="relative flex items-center  pt-1 text-secondary  ">
             
