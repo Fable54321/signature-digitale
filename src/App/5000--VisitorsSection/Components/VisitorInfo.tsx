@@ -133,12 +133,13 @@ const selectedCategoryLabel =
     onClick={() => setIsCategoryOpen((prev) => !prev)}
     className="w-full bg-white border-2 py-2 pl-2 pr-10 border-secondary rounded-lg text-left"
   >
-    {selectedCategoryLabel || " "}
+    {selectedCategoryLabel || "Sélectionnez une catégorie"}
     <span className="absolute right-4 top-1/2 -translate-y-1/2">▾</span>
   </button>
 
   {isCategoryOpen && (
     <div className="absolute z-50 mt-1 w-full bg-white border-2 border-secondary rounded-lg shadow-lg overflow-hidden">
+      
       {visitorCategoryOptions.map((option) => (
         <button
           key={option.value}
