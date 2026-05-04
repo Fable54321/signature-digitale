@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
 
 type Props = {
@@ -8,6 +8,8 @@ type Props = {
 const VisitorsSignatureBlock = ({ onValidate }: Props) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
 
+  const [signatureError, setSignatureError] = useState(false);
+
   const clear = () => {
     sigCanvas.current?.clear();
   };
@@ -15,21 +17,21 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
   const handleValidate = async () => {
     if (!sigCanvas.current) return;
 
-    // if (sigCanvas.current.isEmpty()) {
-    //   alert("Veuillez signer avant de confirmer.");
-    //   return;
-    // }
+    if (sigCanvas.current.isEmpty()) {
+      setSignatureError(true);
+      return;
+    }
 
     const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
 
-    
+    setSignatureError(false);
 
     await onValidate(signatureDataUrl);
   };
 
   return (
     <section className="flex flex-col gap-2 mb-10">
-      <div className="bg-white border-2 border-black my-40">
+      <div className="bg-white border-2 border-black mt-40">
         <SignatureCanvas
           ref={sigCanvas}
           penColor="black"
@@ -39,7 +41,16 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
             className: "sigCanvas w-full",
           }}
         />
+          
       </div>
+    
+     {signatureError && (
+        <p className="text-red-500 text-center mt-2">
+          Veuillez fournir votre signature pour continuer.
+        </p>
+      )}
+
+      <div className="mb-30"></div>
 
       <div className="flex w-full justify-center gap-2">
         <button
@@ -58,6 +69,7 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
           Effacer
         </button>
       </div>
+     
     </section>
   );
 };
