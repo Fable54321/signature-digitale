@@ -175,12 +175,12 @@ if(startVisitorSessionLoading){
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.3em] mt-2">
           <p className="text-center text-[1.2em]">J'accepte les conditions suivantes :</p>
         {(Object.entries(checklist) as Array<[ChecklistKey, boolean]>).map(([key, value]) => (
-          <div key={key} className="relative flex items-center  pt-1  ">
+          <div key={key} className="relative flex items-center  pt-1 text-secondary  ">
             
-            <p className="text-[1.3em] mr-6 pb-3 border-b-3 border-primary border-l pl-10 rounded-b-xl shadow-lg w-full" >{rules[key]}</p>
+            <p className="text-[1.3em] mr-6 pb-3 border-b-3 border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{rules[key]}</p>
 
             <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${value ? "bg-secondary" : "bg-white"}`} htmlFor={`rule-${key}`}>
-              {value && <Check className="text-white" size={30} />}
+              {value && <Check className="text-white" size={50} />}
             </label>
             <input
             id={`rule-${key}`}
@@ -201,10 +201,10 @@ if(startVisitorSessionLoading){
         <div className="w-full flex items-center gap-3">
         <label className="flex flex-col items-center gap-2 w-full text-[1.3em]">
           Autre (précisez): 
-          <textarea value={otherContent} onChange={(e) => setOtherContent(e.target.value)}  className="p-2 border-t-0 border-r-0  flex-1 w-full text-[1em]  border-b-3 border-primary border-l focus:outline-none focus-within:outline-none  rounded-b-lg focus:border-primary shadow-[0_4px_6px_rgba(0,0,0,0.1)]" rows={5}  />
+          <textarea value={otherContent} onChange={(e) => setOtherContent(e.target.value)}  className="bg-tertiary p-2 border-t-0 border-r-0  flex-1 w-full text-[1em]  border-b-3 border-primary border-l focus:outline-none focus-within:outline-none  rounded-b-lg focus:border-primary shadow-[0_4px_6px_rgba(0,0,0,0.1)]" rows={5}  />
         </label>
           <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${isOtherChecked ? "bg-secondary" : "bg-white"}`} htmlFor={`rule-other`}>
-              {<Check className="text-white" size={30}   />}
+              {<Check className="text-white" size={50}   />}
             </label>
             <input
             id={`rule-other`}
@@ -219,7 +219,7 @@ if(startVisitorSessionLoading){
         <div className="flex flex-col gap-2 items-center py-3">
 <p className="text-center">J'ai pris conscience et je comprends la politique <span>(cochez la case, puis signer dans l'espace à cet effet)</span></p>
   <label className={` w-14 h-14 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${isUnderstandingChecked ? "bg-secondary" : "bg-white"}`} htmlFor={`rule-accept`}>
-              {<Check className="text-white" size={30}   />}
+              {<Check className="text-white" size={50}   />}
             </label>
             <input
             id={`rule-accept`}
