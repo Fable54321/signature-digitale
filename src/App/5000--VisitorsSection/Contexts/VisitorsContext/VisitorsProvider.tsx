@@ -21,7 +21,7 @@ export const VisitorsProvider = ({ children }: Props) => {
     const [startVisitorSessionLoading, setStartVisitorSessionLoading] = useState(false);
     const [activeSession, setActiveSession] = useState<activeSessionType | null>(null);
     const [fullSession, setFullSession] = useState<fullSessionType | null>(null);
-    const [token, setToken] = useState<string>("");
+  
     const [sessionSubmissionSuccess, setSessionSubmissionSuccess] = useState(false);
 
 
@@ -115,8 +115,6 @@ export const VisitorsProvider = ({ children }: Props) => {
                 fullSession,
                 startVisitorSessionLoading, 
                 setStartVisitorSessionLoading,
-                token,
-                setToken,
                 sessionSubmissionSuccess,
                 setSessionSubmissionSuccess,
             }}
