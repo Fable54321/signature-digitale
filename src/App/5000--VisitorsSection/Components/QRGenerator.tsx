@@ -24,7 +24,7 @@ const QRGenerator = ({ url }: Props) => {
                             
                             <QRCode
                                 value={`${url}`}
-                                size={200}
+                                size={400}
                             />
                          
                         </div>
