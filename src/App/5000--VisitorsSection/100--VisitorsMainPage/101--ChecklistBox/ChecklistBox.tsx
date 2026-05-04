@@ -69,7 +69,7 @@ const ChecklistBox = () => {
 
 const [planHref, setPlanHref] = useState<string | null>(null);
 
-const shouldShowVisitorFlow = Boolean(planHref) && !startVisitorSessionLoading ;
+const shouldShowVisitorFlow =  !startVisitorSessionLoading ;
 
 useEffect(() => {
   let ignore = false;

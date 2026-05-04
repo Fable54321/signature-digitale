@@ -13,6 +13,7 @@
   --font-primary: var(--font-primary);
   --font-secondary: var(--font-secondary);
   --font-tertiary: var(--font-tertiary);
+  --breakpoint-tablet: 600px;
 }
 
 .custom-input {
