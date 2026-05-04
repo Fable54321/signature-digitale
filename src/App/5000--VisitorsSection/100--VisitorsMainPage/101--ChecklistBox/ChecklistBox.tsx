@@ -217,9 +217,9 @@ if(startVisitorSessionLoading){
             />
         </div>
         <div className="flex flex-col gap-2 items-center py-3">
-<p className="text-center">J'ai pris conscience et je comprends la politique <span>(cochez la case, puis signer dans l'espace à cet effet)</span></p>
-  <label className={` w-14 h-14 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${isUnderstandingChecked ? "bg-secondary" : "bg-white"}`} htmlFor={`rule-accept`}>
-              {<Check className="text-white" size={50}   />}
+<p className="text-center text-[1.3em]">J'ai pris conscience et je comprends la politique <span>(cochez la case, puis signer dans l'espace à cet effet)</span></p>
+  <label className={` w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-secondary border-b-3 border-t-0 border-l-0 hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-accept`}>
+              {isUnderstandingChecked && <Check  className="text-secondary " size={50}   />}
             </label>
             <input
             id={`rule-accept`}
