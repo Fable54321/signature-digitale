@@ -57,9 +57,7 @@ const VisitorInfo = ({ fullName,
       setIsInfoCompleted(true);
     };
 
-    useEffect(()=> {
-      console.log(visitorCategory);
-    },[visitorCategory])
+   
 
 
      
@@ -117,7 +115,9 @@ const VisitorInfo = ({ fullName,
           value={visitorCategory}
           onChange={(e) => setVisitorCategory(e.target.value)}
         >
-          <option className="hidden" value="">{" "}</option>
+          <option value="" disabled>
+  Sélectionner une catégorie
+</option>
           <option value="gouvernement">Travailleur du gouvernement</option>
           <option value="client">Client</option>
           <option value="fournisseur">Fournisseur</option>
