@@ -108,10 +108,10 @@ useEffect(() => {
 
 const handleSubmit = async (signatureDataUrl: string) => {
 
-  if(!isAllChecked){
-    alert("Veuillez lire et accepter tous les termes.");
-    return;
-  }
+  // if(!isAllChecked){
+  //   alert("Veuillez lire et accepter tous les termes.");
+  //   return;
+  // }
 
 
  const payload = {

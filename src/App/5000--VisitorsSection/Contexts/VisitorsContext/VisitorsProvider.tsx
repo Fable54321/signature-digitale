@@ -22,6 +22,7 @@ export const VisitorsProvider = ({ children }: Props) => {
     const [activeSession, setActiveSession] = useState<activeSessionType | null>(null);
     const [fullSession, setFullSession] = useState<fullSessionType | null>(null);
     const [token, setToken] = useState<string>("");
+    const [sessionSubmissionSuccess, setSessionSubmissionSuccess] = useState(false);
 
 
    const startVisitorSession = useCallback(async (payload: ActiveSessionPayload) => {
@@ -29,6 +30,7 @@ export const VisitorsProvider = ({ children }: Props) => {
 
   try {
     setStartVisitorSessionLoading(true);
+    setSessionSubmissionSuccess(false);
 
   
 
@@ -41,6 +43,9 @@ export const VisitorsProvider = ({ children }: Props) => {
   body: {
     signatureDataUrl: payload.signatureDataUrl,
   },
+
+  
+
 });
 
 
@@ -67,10 +72,12 @@ export const VisitorsProvider = ({ children }: Props) => {
       throw new Error("Erreur création visiteur");
     }
 
-    alert("infos de visite enregistrées avec succès")
-
     setActiveSession(createdSession);
-    location.replace(`/visiteurs`);
+    setSessionSubmissionSuccess(true);
+
+    setTimeout(() => {
+      location.replace(`/visiteurs`);
+    }, 2000);
   } catch (error) {
     console.error(error);
   } finally {
@@ -109,7 +116,9 @@ export const VisitorsProvider = ({ children }: Props) => {
                 startVisitorSessionLoading, 
                 setStartVisitorSessionLoading,
                 token,
-                setToken
+                setToken,
+                sessionSubmissionSuccess,
+                setSessionSubmissionSuccess,
             }}
         >
             {children}

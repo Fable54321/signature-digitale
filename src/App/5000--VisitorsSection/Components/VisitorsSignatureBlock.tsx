@@ -15,10 +15,10 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
   const handleValidate = async () => {
     if (!sigCanvas.current) return;
 
-    if (sigCanvas.current.isEmpty()) {
-      alert("Veuillez signer avant de confirmer.");
-      return;
-    }
+    // if (sigCanvas.current.isEmpty()) {
+    //   alert("Veuillez signer avant de confirmer.");
+    //   return;
+    // }
 
     const signatureDataUrl = sigCanvas.current.toDataURL("image/png");
 
