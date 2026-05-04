@@ -3,7 +3,7 @@
 import QRGenerator from "./QRGenerator";
 import { BriefcaseBusiness, CalendarDays, Clock4, ContactRound, NotepadText, Send, UserRound } from "lucide-react";
 import { scrollToBottom } from "../../../Utils/scrollToBottom";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
     fullName: string;
@@ -70,7 +70,18 @@ const isQrVisbile = useMemo(() => {
       }
       },[isQrVisbile])
 
+const visitorCategoryOptions = [
+  { value: "gouvernement", label: "Travailleur du gouvernement" },
+  { value: "client", label: "Client" },
+  { value: "fournisseur", label: "Fournisseur" },
+  { value: "autre", label: "Autre" },
+];
 
+const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
+const selectedCategoryLabel =
+  visitorCategoryOptions.find((option) => option.value === visitorCategory)?.label ||
+  "";
   
 
 
@@ -116,21 +127,38 @@ const isQrVisbile = useMemo(() => {
   <ContactRound className="w-full text-secondary" size={50} />
 </div>
 
-        <select
-          className="mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em] "
-          name="visitorCategory"
-          id="visitorCategory"
-          value={visitorCategory}
-          onChange={(e) => setVisitorCategory(e.target.value)}
+  <div className="relative mx-auto w-[97%] mt-2 text-[1.6em]">
+  <button
+    type="button"
+    onClick={() => setIsCategoryOpen((prev) => !prev)}
+    className="w-full bg-white border-2 py-2 pl-2 pr-10 border-secondary rounded-lg text-left"
+  >
+    {selectedCategoryLabel || " "}
+    <span className="absolute right-4 top-1/2 -translate-y-1/2">▾</span>
+  </button>
+
+  {isCategoryOpen && (
+    <div className="absolute z-50 mt-1 w-full bg-white border-2 border-secondary rounded-lg shadow-lg overflow-hidden">
+      {visitorCategoryOptions.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => {
+            setVisitorCategory(option.value);
+            setIsCategoryOpen(false);
+          }}
+          className={`block w-full text-left px-3 py-3 ${
+            visitorCategory === option.value
+              ? "bg-secondary text-white"
+              : "bg-white text-black"
+          }`}
         >
-          <option value="" disabled>
-  Sélectionner une catégorie
-</option>
-          <option value="gouvernement">Travailleur du gouvernement</option>
-          <option value="client">Client</option>
-          <option value="fournisseur">Fournisseur</option>
-          <option value="autre">Autre</option>
-        </select>
+          {option.label}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
 
     </div>
 
