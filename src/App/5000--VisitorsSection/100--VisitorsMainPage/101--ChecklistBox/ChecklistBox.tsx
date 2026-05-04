@@ -173,13 +173,13 @@ if(startVisitorSessionLoading){
          <form action="" className="px-4">
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.3em] mt-2">
-          <p className="text-center text-[1.2em]">J'accepte les conditions suivantes :</p>
+          <p className="text-center text-[1.2em] font-bold text-secondary ">J'accepte les conditions suivantes :</p>
         {(Object.entries(checklist) as Array<[ChecklistKey, boolean]>).map(([key, value]) => (
           <div key={key} className="relative flex items-center  pt-1 text-secondary  ">
             
-            <p className="text-[1.3em] mr-6 pb-3 border-b-3 border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{rules[key]}</p>
+            <p className="text-[1.3em] mr-6 pb-3 border-b-3  border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{rules[key]}</p>
 
-            <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-gray-300 hover:cursor-pointer flex justify-center items-center ${value ? "bg-secondary" : "bg-white"}`} htmlFor={`rule-${key}`}>
+            <label className={`mr-0 ml-auto w-20 h-20 rounded-xl   border  border-secondary border-b-3 border-t-0 border-l-0 hover:cursor-pointer flex justify-center items-center ${value ? "bg-secondary" : "bg-tertiary"}`} htmlFor={`rule-${key}`}>
               {value && <Check className="text-white" size={50} />}
             </label>
             <input
