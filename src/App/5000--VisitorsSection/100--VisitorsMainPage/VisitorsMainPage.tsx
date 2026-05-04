@@ -5,7 +5,7 @@ import { useVisitors } from "../Contexts/VisitorsContext/UseVisitors";
 
 
 
-const VisitorsMainPage = ( { token } : { token: string } ) => {
+const VisitorsMainPage = ( ) => {
 
 
 const location = useLocation();
