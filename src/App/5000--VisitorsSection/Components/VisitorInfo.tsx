@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+
 
 import QRGenerator from "./QRGenerator";
 import { BriefcaseBusiness, CalendarDays, Clock4, ContactRound, NotepadText, Send, UserRound } from "lucide-react";
