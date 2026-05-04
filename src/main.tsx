@@ -13,15 +13,12 @@ import ChecklistBox from './App/5000--VisitorsSection/100--VisitorsMainPage/101-
 import VisitorsHome from './App/5000--VisitorsSection/100--VisitorsMainPage/1001--VisitorsHome/VisitorsHome'
 import DeparturePage from './App/5000--VisitorsSection/100--VisitorsMainPage/102--DeparturePage/DeparturePage'
 import { VisitorsProvider } from './App/5000--VisitorsSection/Contexts/VisitorsContext/VisitorsProvider'
-import SitesPlan from './App/5000--VisitorsSection/100--VisitorsMainPage/103--SitesPlan/SitesPlan'
 
 
-const generateToken = () => {
-  return crypto.randomUUID();
-};
 
 
-const token = generateToken();    
+
+   
 
 const router = createBrowserRouter([
   {
@@ -55,7 +52,7 @@ const router = createBrowserRouter([
     element: (
   <ProtectedRoute>
     <VisitorsProvider>
-       <VisitorsMainPage token={token} />
+       <VisitorsMainPage  />
     </VisitorsProvider>
   </ProtectedRoute>
   ),
@@ -86,11 +83,6 @@ const router = createBrowserRouter([
   }
 ]
   },
-  {
-    path: '/plan-du-site/:token',
-    element: <SitesPlan />
-  }
-
 ])
 
 
