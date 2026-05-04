@@ -2,6 +2,8 @@
 
 import QRGenerator from "./QRGenerator";
 import { BriefcaseBusiness, CalendarDays, Clock4, ContactRound, NotepadText, Send, UserRound } from "lucide-react";
+import { scrollToBottom } from "../../../Utils/scrollToBottom";
+import { useEffect, useMemo } from "react";
 
 type Props = {
     fullName: string;
@@ -58,9 +60,15 @@ const VisitorInfo = ({ fullName,
     };
 
    
+const isQrVisbile = useMemo(() => {
+  return visitorCategory !== "gouvernement" && visitorCategory !== "" && url !== null;
+}, [visitorCategory, url])
 
-
-     
+     useEffect(() => { 
+      if(isQrVisbile) {
+        scrollToBottom();
+      }
+      },[isQrVisbile])
 
 
   
