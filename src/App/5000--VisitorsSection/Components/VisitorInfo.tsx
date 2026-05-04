@@ -1,7 +1,7 @@
 
 
 import QRGenerator from "./QRGenerator";
-import { BriefcaseBusiness, CalendarDays, Clock4, ContactRound, NotepadText, Send, UserRound } from "lucide-react";
+import { AlertCircle, BriefcaseBusiness, CalendarDays, Clock4, ContactRound, NotepadText, Send, UserRound } from "lucide-react";
 import { scrollToBottom } from "../../../Utils/scrollToBottom";
 import { useEffect, useMemo, useState } from "react";
 
@@ -41,18 +41,36 @@ const VisitorInfo = ({ fullName,
 
 
 
+const [nameError, setNameError] = useState(false);
+const [visitReasonError, setVisitReasonError] = useState(false);
+const [visitorCategoryError, setVisitorCategoryError] = useState(false);
 
+const inputClassName = "mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em] focus:outline-none focus:ring-2 focus:ring-secondary/30";
+const inputErrorClassName = "border-red-500 bg-red-50 focus:ring-red-200";
+const errorClassName = "flex items-center gap-2 text-red-600 text-[0.95em] font-medium";
 
- 
+const FieldError = ({ id, children }: { id: string; children: React.ReactNode }) => (
+  <p id={id} className={errorClassName} role="alert">
+    <AlertCircle size={18} aria-hidden="true" />
+    <span>{children}</span>
+  </p>
+);
 
 
     const handleInfoCompletion = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // if (!fullName || !visitReason || !visitorCategory){
-        //     alert("Veuillez indiquez au moins le nom complet, la catégorie du visiteur et la raison de la visite.");
-        //     return;
-        // }
+        const hasNameError = !fullName;
+        const hasVisitReasonError = !visitReason;
+        const hasVisitorCategoryError = !visitorCategory;
+
+        setNameError(hasNameError);
+        setVisitReasonError(hasVisitReasonError);
+        setVisitorCategoryError(hasVisitorCategoryError);
+
+        if (hasNameError || hasVisitReasonError || hasVisitorCategoryError){
+            return;
+        }
        
 
       
@@ -88,20 +106,30 @@ const selectedCategoryLabel =
 
   return (
     <form onSubmit={(e) => {handleInfoCompletion(e)}} className="flex flex-col gap-4 px-2">
+<div className="flex flex-col gap-1">
 <div className="flex items-center gap-5">
     <div className="p-2 bg-[#f4f6ee] rounded-xl">
       <UserRound className="w-full text-secondary" size={50} />
     </div>
 
       <input
-        className="mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
+        className={`${inputClassName} ${nameError ? inputErrorClassName : ""}`}
         type="text"
         placeholder="Nom complet"
         value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
+        aria-invalid={nameError}
+        aria-describedby={nameError ? "visitor-name-error" : undefined}
+        onChange={(e) => {
+          setFullName(e.target.value);
+          if (nameError) {
+            setNameError(false);
+          }
+        }}
       />
+      
 </div>
-
+{nameError && <FieldError id="visitor-name-error">Le nom complet est requis.</FieldError>}
+</div>
 <div className="flex items-center gap-5">
 
     <div className="p-2 bg-[#f4f6ee] rounded-xl">
@@ -109,16 +137,45 @@ const selectedCategoryLabel =
     </div>
 
       <input
-        className="mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
+        className={inputClassName}
         type="text"
         placeholder="Nom de l'entreprise (si applicable)"
         value={companyName}
         onChange={(e) => setCompanyName(e.target.value)}
       />
+      
 </div>
 
 
-      <label htmlFor="vistorCategory" className="w-full flex flex-col">
+      
+      
+      <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-5 ">
+
+      <div className="p-2 bg-[#f4f6ee] rounded-xl">
+        <NotepadText className="w-full text-secondary" size={50} />
+      </div>
+
+
+      <input
+        className={`${inputClassName} ${visitReasonError ? inputErrorClassName : ""}`}
+        type="text"
+        placeholder="Raison de la visite"
+        value={visitReason}
+        aria-invalid={visitReasonError}
+        aria-describedby={visitReasonError ? "visit-reason-error" : undefined}
+        onChange={(e) => {
+          setVisitReason(e.target.value);
+          if (visitReasonError) {
+            setVisitReasonError(false);
+          }
+        }}
+      />
+      
+</div>
+</div>
+{visitReasonError && <FieldError id="visit-reason-error">La raison de la visite est requise.</FieldError>}
+<label htmlFor="visitorCategory" className="w-full flex flex-col border-b-2 border-[#e5ebd5] pb-7 border-dashed">
       <span className="ml-4 text-secondary font-medium">  Quelle catégorie de visiteur s'applique à vous ? </span>
 
 <div className="flex items-center w-full gap-5 mt-2">
@@ -129,9 +186,14 @@ const selectedCategoryLabel =
 
   <div className="relative mx-auto w-[97%] mt-2 text-[1.6em]">
   <button
+    id="visitorCategory"
     type="button"
     onClick={() => setIsCategoryOpen((prev) => !prev)}
-    className="w-full bg-white border-2 py-2 pl-2 pr-10 border-secondary rounded-lg text-left"
+    className={`w-full bg-white border-2 py-2 pl-2 pr-10 border-secondary rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-secondary/30 ${visitorCategoryError ? inputErrorClassName : ""}`}
+    aria-haspopup="listbox"
+    aria-expanded={isCategoryOpen}
+    aria-invalid={visitorCategoryError}
+    aria-describedby={visitorCategoryError ? "visitor-category-error" : undefined}
   >
     {selectedCategoryLabel || "Sélectionnez une catégorie"}
     <span className="absolute right-4 top-1/2 -translate-y-1/2">▾</span>
@@ -146,6 +208,9 @@ const selectedCategoryLabel =
           type="button"
           onClick={() => {
             setVisitorCategory(option.value);
+            if (visitorCategoryError) {
+              setVisitorCategoryError(false);
+            }
             setIsCategoryOpen(false);
           }}
           className={`block w-full text-left px-3 py-3 ${
@@ -162,25 +227,9 @@ const selectedCategoryLabel =
 </div>
 
     </div>
-
+    
       </label>
-      
-      <div className="flex items-center gap-5 border-b-2 border-[#e5ebd5] pb-7 border-dashed">
-
-      <div className="p-2 bg-[#f4f6ee] rounded-xl">
-        <NotepadText className="w-full text-secondary" size={50} />
-      </div>
-
-
-      <input
-        className="mx-auto bg-white w-[97%]  border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
-        type="text"
-        placeholder="Raison de la visite"
-        value={visitReason}
-        onChange={(e) => setVisitReason(e.target.value)}
-      />
-</div>
-
+{visitorCategoryError && <FieldError id="visitor-category-error">La cat&eacute;gorie de visiteur est requise.</FieldError>}
 <div className="mt-2 relative flex  justify-between items-center  py-3.5  bg-[#f4f6ee] rounded-xl ">
   <div className="flex items-center gap-5 pl-15">
     <div className="bg-[#e5ebd5] p-2 rounded-xl">
