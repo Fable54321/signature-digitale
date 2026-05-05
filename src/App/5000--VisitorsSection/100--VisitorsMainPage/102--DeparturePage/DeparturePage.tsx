@@ -27,9 +27,12 @@ const DeparturePage = () => {
 
   return (
     <section className="flex flex-col items-center">
-      <div className="mt-10 flex items-center text-[4em] font-secondary font-bold">
+      <div className="mt-10 flex items-center text-[4em] font-secondary font-bold gap-2">
         <p>Je :</p>
-        <select>
+        <select className="w-fit
+        px-2 text-center bg-white
+         text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-secondary
+         rounded-lg">
           {activeVisits.map((visit, index) => (
             <option key={index} value={visit.full_name}>
               {visit.full_name}
