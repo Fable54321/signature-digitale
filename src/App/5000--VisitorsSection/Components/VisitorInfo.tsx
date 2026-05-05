@@ -112,7 +112,7 @@ const selectedCategoryLabel =
 
 
   return (
-    <form onSubmit={(e) => {handleInfoCompletion(e)}} className="flex flex-col gap-4 px-2">
+    <form onSubmit={(e) => {handleInfoCompletion(e)}} noValidate className="flex flex-col gap-4 px-2">
 <div className="flex flex-col gap-1">
 <div className="flex items-center gap-5">
     <div className="p-2 bg-[#f4f6ee] rounded-xl">
@@ -281,11 +281,20 @@ const selectedCategoryLabel =
       <Send className="w-full text-secondary" size={50} />
     </div>
         <input
-          className=" mx-a bg-whiteuto w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em]"
+          id="email"
+          className={`${inputClassName} ${hasEmailError ? inputErrorClassName : ""}`}
           type="email"
+          inputMode="email"
           placeholder="laissez vide pour ne pas recevoir de courriel"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          aria-invalid={hasEmailError}
+          aria-describedby={hasEmailError ? "email-error" : undefined}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (hasEmailError) {
+              setHasEmailError(false);
+            }
+          }}
         />
         </div>
        </label>
