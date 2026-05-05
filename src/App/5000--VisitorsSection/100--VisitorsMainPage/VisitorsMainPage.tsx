@@ -23,7 +23,7 @@ if (sessionSubmissionSuccess) {
         <div className="relative ">
           <div className="absolute top-1/2 -translate-y-1/2 right-40 w-[120%] h-0.5 bg-linear-to-r from-secondary/20 to-secondary"></div>
         <img src={vegibecFlower} alt="Vegibec Flower" className="w-35"  />
-        <div className="absolute top-1/2 -translate-y-1/2 left-40 w-[120%] h-0.5 bg-linear-to-rrom-secondary to-secondary/20"></div>
+        <div className="absolute top-1/2 -translate-y-1/2 left-40 w-[120%] h-0.5 bg-linear-to-r from-secondary to-secondary/20"></div>
 </div>
 <div className="relative mb-10">
       <h2 className="text-[3.5em] font-bold font-primary text-secondary text-center leading-tight">Registre des visiteurs</h2>
