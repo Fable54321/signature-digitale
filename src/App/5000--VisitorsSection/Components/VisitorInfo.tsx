@@ -44,6 +44,7 @@ const VisitorInfo = ({ fullName,
 const [nameError, setNameError] = useState(false);
 const [visitReasonError, setVisitReasonError] = useState(false);
 const [visitorCategoryError, setVisitorCategoryError] = useState(false);
+const [hasEmailError, setHasEmailError] = useState(false);
 
 const inputClassName = "mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em] focus:outline-none focus:ring-2 focus:ring-secondary/30";
 const inputErrorClassName = "border-red-500 bg-red-50 focus:ring-red-200";
@@ -56,6 +57,8 @@ const FieldError = ({ id, children }: { id: string; children: React.ReactNode })
   </p>
 );
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
     const handleInfoCompletion = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -63,12 +66,16 @@ const FieldError = ({ id, children }: { id: string; children: React.ReactNode })
         const hasNameError = !fullName;
         const hasVisitReasonError = !visitReason;
         const hasVisitorCategoryError = !visitorCategory;
+        const hasEmailError = email &&!emailRegex.test(email);
 
         setNameError(hasNameError);
         setVisitReasonError(hasVisitReasonError);
         setVisitorCategoryError(hasVisitorCategoryError);
+        setHasEmailError(hasEmailError);
 
-        if (hasNameError || hasVisitReasonError || hasVisitorCategoryError){
+
+
+        if (hasNameError || hasVisitReasonError || hasVisitorCategoryError || hasEmailError) {
             return;
         }
        
@@ -285,7 +292,7 @@ const selectedCategoryLabel =
 
             <p className=" text-[0.8em] ">(Vegibec inc. ne conservera pas votre addresse courriel.)</p>
       </div>  }
-              
+      {hasEmailError && <FieldError id="email-error">Veuillez entrer une adresse courriel valide ou laisser le champ vide.</FieldError>}        
       
       
       
