@@ -66,7 +66,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const hasNameError = !fullName;
         const hasVisitReasonError = !visitReason;
         const hasVisitorCategoryError = !visitorCategory;
-        const hasEmailError = email &&!emailRegex.test(email);
+        const hasEmailError = !email ? false : !emailRegex.test(email);
 
         setNameError(hasNameError);
         setVisitReasonError(hasVisitReasonError);
