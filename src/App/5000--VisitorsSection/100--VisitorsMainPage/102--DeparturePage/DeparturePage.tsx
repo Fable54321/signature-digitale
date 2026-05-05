@@ -27,9 +27,9 @@ const DeparturePage = () => {
 
   return (
     <section className="flex flex-col items-center">
-      <div className="mt-10 flex items-center text-[4em] font-secondary font-bold gap-2">
+      <div className="mt-10 flex items-center text-[4em] font-secondary font-bold gap-2 w-[98%] justify-center">
         <p>Je :</p>
-        <select className="w-fit
+        <select className="w-[50%]
         px-2 text-center bg-white
          text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-secondary
          rounded-lg">
@@ -41,7 +41,7 @@ const DeparturePage = () => {
         </select>
       </div>
         <p className="text-[2em] mt-5 font-secondary">Confirme avoir quitter à :</p>
-       <p className="text-[2em]">{currentTime.toLocaleTimeString()}</p>
+       <p className="text-[3em] font-bold">{currentTime.toLocaleTimeString()}</p>
     </section>
   )
 }
