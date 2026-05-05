@@ -9,6 +9,10 @@ export type activeSessionType = {
     visit_reason: string;
 }
 
+export type ActiveVisitType = activeSessionType & {
+    id: number;
+};
+
 export type fullSessionType = activeSessionType & {
     departure_time: Date;
     arrival_signature_url: string;
@@ -44,6 +48,10 @@ type VisitorsContextType = {
     getActiveSession: () => activeSessionType | null;
     activeSession: activeSessionType | null;
     setActiveSession: React.Dispatch<React.SetStateAction<activeSessionType | null>>;
+    activeVisits: ActiveVisitType[];
+    fetchActiveVisits: () => Promise<void>;
+    activeVisitsLoading: boolean;
+    activeVisitsError: string | null;
     getFullSession: () => fullSessionType | null;
     fullSession: fullSessionType | null;
     startVisitorSessionLoading: boolean;

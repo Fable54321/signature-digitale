@@ -3,6 +3,7 @@ import { fetchWithAuth } from "../../Utils/fetchWithAuth";
 import { 
     VisitorsContext, 
     type ActiveSessionPayload, 
+    type ActiveVisitType,
     type activeSessionType, 
     type fullSessionType,
 type SignatureResponse } from "./VisitorsContext";
@@ -19,8 +20,11 @@ type Props = {
 export const VisitorsProvider = ({ children }: Props) => {
 
     const [startVisitorSessionLoading, setStartVisitorSessionLoading] = useState(false);
+    const [activeVisitsLoading, setActiveVisitsLoading] = useState(false);
     const [activeSession, setActiveSession] = useState<activeSessionType | null>(null);
+    const [activeVisits, setActiveVisits] = useState<ActiveVisitType[]>([]);
     const [fullSession, setFullSession] = useState<fullSessionType | null>(null);
+    const [activeVisitsError, setActiveVisitsError] = useState<string | null>(null);
   
     const [sessionSubmissionSuccess, setSessionSubmissionSuccess] = useState(false);
 
@@ -85,6 +89,22 @@ export const VisitorsProvider = ({ children }: Props) => {
   }
 }, []);
 
+     const fetchActiveVisits = useCallback(async () => {
+         try {
+             setActiveVisitsLoading(true);
+             setActiveVisitsError(null);
+
+             const visits = await fetchWithAuth<ActiveVisitType[]>("/visitors/active");
+
+             setActiveVisits(visits);
+         } catch (error) {
+             console.error(error);
+             setActiveVisitsError("Impossible de charger les visites actives.");
+         } finally {
+             setActiveVisitsLoading(false);
+         }
+     }, []);
+
      const endVisitorSession = useCallback(() => {
          setActiveSession(null);
          setFullSession(null);
@@ -111,6 +131,10 @@ export const VisitorsProvider = ({ children }: Props) => {
                 getActiveSession,
                 activeSession,
                 setActiveSession,
+                activeVisits,
+                fetchActiveVisits,
+                activeVisitsLoading,
+                activeVisitsError,
                 getFullSession,
                 fullSession,
                 startVisitorSessionLoading, 
