@@ -19,7 +19,7 @@ if (sessionSubmissionSuccess) {
 
 
   return (
-    <article className={`relative flex flex-col items-center font-secondary pb-4 max-sm[0.85rem] lg:mt-0 tablet:justify-center tablet:min-h-screen  ${location.pathname === '/visiteurs' ? 'tablet:-mt-10' : ''}`}>
+    <article className={`relative flex flex-col items-center font-secondary pb-4 max-sm[0.85rem] lg:mt-0 tablet:justify-center w-full tablet:min-h-screen  ${location.pathname === '/visiteurs' ? 'tablet:-mt-10' : ''}`}>
         <div className="relative ">
           <div className="absolute top-1/2 -translate-y-1/2 right-40 w-[120%] h-0.5 bg-linear-to-r from-secondary/20 to-secondary"></div>
         <img src={vegibecFlower} alt="Vegibec Flower" className="w-35"  />

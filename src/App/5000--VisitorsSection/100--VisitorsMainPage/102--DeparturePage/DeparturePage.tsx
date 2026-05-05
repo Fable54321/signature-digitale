@@ -35,8 +35,10 @@ const DeparturePage = () => {
     const selectedVisit = activeVisits.find((visit) => visit.id === selectedVisitId);
 
   return (
-    <section className="flex flex-col items-center">
-      <div className="mt-10 flex items-center text-[1.5em] font-secondary font-bold gap-2 w-[98%] justify-center">
+    <section className="flex flex-col items-center w-full gap-4">
+      <div className="mt-10 flex items-center text-[2em] 
+      text-secondary
+      font-secondary font-bold gap-2 w-[60%] justify-center ">
         <p>Je :</p>
         <div className="relative w-[60%]">
           <button
@@ -46,7 +48,11 @@ const DeparturePage = () => {
                 setIsFullNameOpen((prev) => !prev);
               }
             }}
-            className="w-full px-2 pr-12 text-center bg-white text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-secondary rounded-lg disabled:bg-gray-100 disabled:text-gray-500"
+            className="w-full px-2 pr-12 text-center bg-white
+             text-secondary border border-gray-300 focus:outline-none focus:ring-2
+              focus:ring-secondary rounded-lg disabled:bg-gray-100
+              py-1
+               disabled:text-gray-500"
             aria-haspopup="listbox"
             aria-expanded={isFullNameOpen}
             disabled={activeVisits.length === 0}
@@ -78,8 +84,10 @@ const DeparturePage = () => {
           )}
         </div>
       </div>
+      <div className="flex flex-col items-center p-3 bg-white rounded-lg">
         <p className="text-[2em] mt-5 font-secondary">Confirme avoir quitter à :</p>
        <p className="text-[3em] font-bold">{currentTime.toLocaleTimeString()}</p>
+       </div>
     </section>
   )
 }
