@@ -3,6 +3,8 @@ import Spinner from "../../../../Components/Spinner";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import { scrollToBottom } from "../../../../Utils/scrollToBottom";
+import { CircleX } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const DeparturePage = () => {
   const {
@@ -46,6 +48,12 @@ const DeparturePage = () => {
       scrollToBottom()
     }
   },[selectedVisit])
+
+  const navigate = useNavigate();
+
+  const handleNavigateHome = () => {
+  navigate("/visiteurs");
+}
 
   const handleDepartureSubmit = async (signatureDataUrl: string) => {
     if (!selectedVisit) return;
@@ -132,6 +140,9 @@ const DeparturePage = () => {
           <VisitorsSignatureBlock onValidate={handleDepartureSubmit} />
         </div>
       )}
+       <button onClick={handleNavigateHome} className="text-red-600 absolute bottom-5 left-1/2 -translate-x-1/2">
+      <CircleX strokeWidth={2.5} size={64} />
+    </button>
     </section>
   );
 };
