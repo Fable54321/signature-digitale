@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ArrowRight, LogIn, LogOut, CircleX } from "lucide-react"
+import { ArrowRight, LogIn, LogOut } from "lucide-react"
 import vegibecLogo from '../../../../assets/vegibec.png'
 
 
