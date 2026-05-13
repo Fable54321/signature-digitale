@@ -154,8 +154,8 @@ if(startVisitorSessionLoading){
 
 
   return (
-
-    <section className="border bg-white border-gray-200 mt-4 w-[min(98%,800px)] py-2 px-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
+<>
+    <section className=" border bg-white border-gray-200 mt-4 w-[min(98%,800px)] py-2 px-2  flex flex-col gap-3 shadow-2xl rounded-xl ">
       
       <div className=" flex items-center gap-5 bg-[#f4f6ee] rounded-xl">
         <div className="bg-secondary p-1 rounded-full">
@@ -253,11 +253,12 @@ if(startVisitorSessionLoading){
 
       </form>
       )}
-      <button onClick={handleNavigateHome} className="text-red-600 absolute bottom-5 left-1/2 -translate-x-1/2">
+      
+    </section>
+  <button onClick={handleNavigateHome} className="text-red-600  pt-30">
       <CircleX strokeWidth={2.5} size={64} />
     </button>
-    </section>
-  
+    </>
   )
 }
 

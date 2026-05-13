@@ -70,6 +70,7 @@ const DeparturePage = () => {
   }
 
   return (
+    <>
     <section className="flex flex-col items-center w-full gap-4">
       <div
         className="mt-10 flex items-center text-[2em]
@@ -140,10 +141,12 @@ const DeparturePage = () => {
           <VisitorsSignatureBlock onValidate={handleDepartureSubmit} />
         </div>
       )}
-       <button onClick={handleNavigateHome} className="text-red-600 absolute bottom-5 left-1/2 -translate-x-1/2">
+      
+    </section>
+     <button onClick={handleNavigateHome} className="text-red-600  mt-70 -mb-70">
       <CircleX strokeWidth={2.5} size={64} />
     </button>
-    </section>
+    </>
   );
 };
 
