@@ -1,44 +1,73 @@
 import { useEffect, useState } from "react";
+import Spinner from "../../../../Components/Spinner";
+import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
-
+import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 
 const DeparturePage = () => {
+  const {
+    fetchActiveVisits,
+    activeVisits,
+    activeVisitsLoading,
+    activeVisitsError,
+    endVisitorSession,
+    endVisitorSessionLoading,
+  } = useVisitors();
 
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedVisitId, setSelectedVisitId] = useState<number | null>(null);
+  const [isFullNameOpen, setIsFullNameOpen] = useState(false);
 
-  const { fetchActiveVisits, activeVisits } = useVisitors();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
-    const [currentTime, setCurrentTime] = useState(new Date());
-    const [selectedVisitId, setSelectedVisitId] = useState<number | null>(null);
-    const [isFullNameOpen, setIsFullNameOpen] = useState(false);
+    return () => clearInterval(interval);
+  }, []);
 
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentTime(new Date());
-      }, 1000);
-      return () => clearInterval(interval);
-    }, []);
+  useEffect(() => {
+    void fetchActiveVisits();
+  }, [fetchActiveVisits]);
 
+  useEffect(() => {
+    if (
+      selectedVisitId !== null &&
+      !activeVisits.some((visit) => visit.id === selectedVisitId)
+    ) {
+      setSelectedVisitId(null);
+    }
+  }, [activeVisits, selectedVisitId]);
 
-    useEffect(() => {
-     void fetchActiveVisits();
-    }, [fetchActiveVisits]);
+  const selectedVisit = activeVisits.find((visit) => visit.id === selectedVisitId);
 
-    useEffect(() => {
-      if (
-        selectedVisitId !== null &&
-        !activeVisits.some((visit) => visit.id === selectedVisitId)
-      ) {
-        setSelectedVisitId(null);
-      }
-    }, [activeVisits, selectedVisitId]);
+  useEffect(() => {
+    if(selectedVisit){
+      scrollToBottom()
+    }
+  },[selectedVisit])
 
-    const selectedVisit = activeVisits.find((visit) => visit.id === selectedVisitId);
+  const handleDepartureSubmit = async (signatureDataUrl: string) => {
+    if (!selectedVisit) return;
+
+    await endVisitorSession({
+      id: selectedVisit.id,
+      departure_time: new Date().toISOString(),
+      signatureDataUrl,
+    });
+  };
+
+  if (endVisitorSessionLoading) {
+    return <Spinner />;
+  }
 
   return (
     <section className="flex flex-col items-center w-full gap-4">
-      <div className="mt-10 flex items-center text-[2em] 
+      <div
+        className="mt-10 flex items-center text-[2em]
       text-secondary
-      font-secondary font-bold gap-2 w-[60%] justify-center ">
+      font-secondary font-bold gap-2 w-[60%] justify-center "
+      >
         <p>Je :</p>
         <div className="relative w-[60%]">
           <button
@@ -57,8 +86,11 @@ const DeparturePage = () => {
             aria-expanded={isFullNameOpen}
             disabled={activeVisits.length === 0}
           >
-            {selectedVisit?.full_name || (activeVisits.length > 0 ? "Sélectionnez votre nom" : "Aucun visiteur actif")}
-            <span className="absolute right-4 top-1/2 -translate-y-1/2">▾</span>
+            {selectedVisit?.full_name ||
+              (activeVisits.length > 0
+                ? "Sélectionnez votre nom"
+                : "Aucun visiteur actif")}
+            <span className="absolute right-4 top-1/2 -translate-y-1/2">▼</span>
           </button>
 
           {isFullNameOpen && (
@@ -84,12 +116,24 @@ const DeparturePage = () => {
           )}
         </div>
       </div>
-      <div className="flex flex-col items-center p-3 bg-white rounded-lg">
-        <p className="text-[2em] mt-5 font-secondary">Confirme avoir quitter à :</p>
-       <p className="text-[3em] font-bold">{currentTime.toLocaleTimeString()}</p>
-       </div>
-    </section>
-  )
-}
 
-export default DeparturePage
+      {activeVisitsLoading && <Spinner />}
+      {activeVisitsError && (
+        <p className="text-red-500 text-center text-[1.2em]">{activeVisitsError}</p>
+      )}
+
+      <div className="flex flex-col items-center p-3 bg-white rounded-lg">
+        <p className="text-[2em] mt-5 font-secondary">Confirme avoir quitté à :</p>
+        <p className="text-[3em] font-bold">{currentTime.toLocaleTimeString()}</p>
+      </div>
+
+      {selectedVisit && (
+        <div className="w-[min(98%,800px)]">
+          <VisitorsSignatureBlock onValidate={handleDepartureSubmit} />
+        </div>
+      )}
+    </section>
+  );
+};
+
+export default DeparturePage;

@@ -36,6 +36,13 @@ export type ActiveSessionPayload = activeSessionType & {
     signatureDataUrl: string;
     checklist: CheckBoxType;
 }
+
+export type DepartureSessionPayload = {
+    id: number;
+    departure_time: string;
+    signatureDataUrl: string;
+}
+
 export type SignatureResponse ={
     key: string;
     url: string;
@@ -44,7 +51,7 @@ export type SignatureResponse ={
 
 type VisitorsContextType = { 
     startVisitorSession: (payload: ActiveSessionPayload) => Promise<void>;
-    endVisitorSession: () => void;
+    endVisitorSession: (payload: DepartureSessionPayload) => Promise<void>;
     getActiveSession: () => activeSessionType | null;
     activeSession: activeSessionType | null;
     setActiveSession: React.Dispatch<React.SetStateAction<activeSessionType | null>>;
@@ -55,6 +62,7 @@ type VisitorsContextType = {
     getFullSession: () => fullSessionType | null;
     fullSession: fullSessionType | null;
     startVisitorSessionLoading: boolean;
+    endVisitorSessionLoading: boolean;
     setStartVisitorSessionLoading: React.Dispatch<React.SetStateAction<boolean>>;
     sessionSubmissionSuccess: boolean;
     setSessionSubmissionSuccess: React.Dispatch<React.SetStateAction<boolean>>;
