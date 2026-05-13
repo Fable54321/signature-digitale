@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
 
 type Props = {
@@ -7,8 +7,30 @@ type Props = {
 
 const VisitorsSignatureBlock = ({ onValidate }: Props) => {
   const sigCanvas = useRef<SignatureCanvas | null>(null);
+  const canvasContainer = useRef<HTMLDivElement | null>(null);
 
   const [signatureError, setSignatureError] = useState(false);
+  const [canvasWidth, setCanvasWidth] = useState(800);
+
+  useLayoutEffect(() => {
+    const updateCanvasWidth = () => {
+      const width = canvasContainer.current?.clientWidth;
+
+      if (width) {
+        setCanvasWidth(Math.floor(width));
+      }
+    };
+
+    updateCanvasWidth();
+
+    const resizeObserver = new ResizeObserver(updateCanvasWidth);
+
+    if (canvasContainer.current) {
+      resizeObserver.observe(canvasContainer.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   const clear = () => {
     sigCanvas.current?.clear();
@@ -31,14 +53,14 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
 
   return (
     <section className="flex flex-col gap-2 mb-10">
-      <div className="bg-white border-2 border-black mt-40">
+      <div ref={canvasContainer} className="bg-white border-2 border-black mt-40">
         <SignatureCanvas
           ref={sigCanvas}
           penColor="black"
           canvasProps={{
-            width: 800,
+            width: canvasWidth,
             height: 120,
-            className: "sigCanvas w-full",
+            className: "sigCanvas block w-full h-[120px]",
           }}
         />
           
