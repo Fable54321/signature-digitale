@@ -6,6 +6,7 @@ import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
 import Spinner from "../../../../Components/Spinner";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -111,8 +112,12 @@ useEffect(() => {
   };
 }, [API_BASE_URL]);
 
-    
+const navigate = useNavigate();
 
+    
+const handleNavigateHome = () => {
+  navigate("/visiteurs");
+}
 
 
 
@@ -248,7 +253,7 @@ if(startVisitorSessionLoading){
 
       </form>
       )}
-      <button className="text-red-600 absolute bottom-5 left-1/2 -translate-x-1/2">
+      <button onClick={handleNavigateHome} className="text-red-600 absolute bottom-5 left-1/2 -translate-x-1/2">
       <CircleX strokeWidth={2.5} size={64} />
     </button>
     </section>
