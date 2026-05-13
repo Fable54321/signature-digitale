@@ -28,9 +28,7 @@ const VisitorsHome = () => {
       </Link>
       </div> 
 
-    <button className="text-red-600 absolute bottom-0 left-1/2 -translate-x-1/2">
-      <CircleX strokeWidth={2.5} size={64} />
-    </button>
+    
 
     </section>
   )
