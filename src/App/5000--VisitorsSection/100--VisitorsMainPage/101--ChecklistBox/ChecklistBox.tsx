@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { rules } from "../../Utils/Rules";
-import { Check, UserRound } from "lucide-react";
+import { Check, CircleX, UserRound } from "lucide-react";
 import { scrollToBottom, scrollToTop } from "../../../../Utils/scrollToBottom";
 import VisitorsSignatureBlock from "../../Components/VisitorsSignatureBlock";
 import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
@@ -248,6 +248,9 @@ if(startVisitorSessionLoading){
 
       </form>
       )}
+      <button className="text-red-600 absolute bottom-5 left-1/2 -translate-x-1/2">
+      <CircleX strokeWidth={2.5} size={64} />
+    </button>
     </section>
   
   )

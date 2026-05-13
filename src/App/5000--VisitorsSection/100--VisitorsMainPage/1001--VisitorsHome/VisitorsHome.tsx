@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom"
-import { ArrowRight, LogIn, LogOut } from "lucide-react"
+import { ArrowRight, LogIn, LogOut, CircleX } from "lucide-react"
 import vegibecLogo from '../../../../assets/vegibec.png'
+
 
 const VisitorsHome = () => {
   return (
-    <section className="flex flex-col items-center gap-10 w-[min(98%,800px)] ">
+    <section className="relative flex flex-col items-center gap-10 w-[min(98%,800px)] ">
         <img src={vegibecLogo} alt="Vegibec Logo" className=' w-80 mt-10 tablet:w-150' />
        <div className="flex flex-col  gap-4 w-full">
       <Link to="arrivee"  className="bg-secondary font-primary font-bold rounded-sm py-1 px-5 text-white text-[2.9em] tablet:text-[4.5em] flex items-center justify-between gap-4" >
@@ -26,6 +27,11 @@ const VisitorsHome = () => {
         <ArrowRight className="h-[0.8em] w-[0.8em]" strokeWidth={2.5} />
       </Link>
       </div> 
+
+    <button className="text-red-600 absolute bottom-0 left-1/2 -translate-x-1/2">
+      <CircleX strokeWidth={2.5} size={64} />
+    </button>
+
     </section>
   )
 }
