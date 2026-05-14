@@ -171,6 +171,11 @@ body,
   background-color: #F6F9F3;
 }
 
+html,
+body {
+  touch-action: pan-y;
+}
+
 
 .fade-image {
    -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, 
