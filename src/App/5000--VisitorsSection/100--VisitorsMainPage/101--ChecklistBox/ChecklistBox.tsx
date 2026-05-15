@@ -189,14 +189,17 @@ if(startVisitorSessionLoading){
          <form action="" className="px-4">
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.3em] mt-2">
+          <div className="flex flex-col items-center gap-0">
           <p className="text-center text-[1.2em] font-bold text-secondary ">J'accepte les conditions suivantes :</p>
+          <p>(cochez les cases sur la droite)</p>
+          </div>
           {isAllcheckedError && <p className="text-red-500 text-center text-[1em]">Veuillez accepter toutes les conditions pour continuer.</p>}
         {(Object.entries(checklist) as Array<[ChecklistKey, boolean]>).map(([key, value]) => (
           <div key={key} className="relative flex items-center  pt-1 text-secondary  ">
             
             <p className="text-[1.3em] mr-6 pb-3 border-b-3  border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{rules[key]}</p>
 
-            <label className={`mr-0 ml-auto w-20 h-20 rounded-xl   border  border-secondary border-b-3 border-t-0 border-l-0 hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-${key}`}>
+            <label className={`mr-0 ml-auto w-20 h-20 rounded-xl   border  border-secondary border-b-3 border-t border-l hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-${key}`}>
               {value && <Check className="text-secondary" size={50} />}
             </label>
             <input
@@ -220,7 +223,7 @@ if(startVisitorSessionLoading){
           Autre (précisez): 
           <textarea value={otherContent} onChange={(e) => setOtherContent(e.target.value)}  className="bg-tertiary p-2 border-t-0 border-r-0  flex-1 w-full text-[1em]  border-b-3 border-primary border-l focus:outline-none focus-within:outline-none  rounded-b-lg focus:border-primary shadow-[0_4px_6px_rgba(0,0,0,0.1)]" rows={5}  />
         </label>
-          <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border   border-secondary border-b-3 border-t-0 border-l-0 hover:cursor-pointer flex justify-center items-center bg-tertiary `} htmlFor={`rule-other`}>
+          <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border   border-secondary border-b-3 border-t border-l hover:cursor-pointer flex justify-center items-center bg-tertiary `} htmlFor={`rule-other`}>
               {<Check className= {`text-secondary ${isOtherChecked ? " " : "hidden"}`} size={50}   />}
             </label>
             <input
