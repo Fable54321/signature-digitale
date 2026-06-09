@@ -5,7 +5,7 @@ import type { JSX } from "react";
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
 
-const PORTAL_LOGIN_URL = "https://vegibec-portail.com/connection"
+const PORTAL_LOGIN_URL = "https://vegibec-portail.com/login"
 
   const { user, loading, setIsAuthorized } = useAuth();
 
