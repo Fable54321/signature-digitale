@@ -99,6 +99,7 @@ const visitorCategoryOptions = [
   { value: "gouvernement", label: "Travailleur du gouvernement" },
   { value: "client", label: "Client" },
   { value: "fournisseur", label: "Fournisseur" },
+  { value: "transporteur-livreur", label: "Transporteur/livreur" },
   { value: "autre", label: "Autre" },
 ];
 
