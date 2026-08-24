@@ -102,6 +102,8 @@ const visitorCategoryOptions = [
   { value: "autre", label: "Autre" },
 ];
 
+const visitReasonQuickOptions = ["Pick-up", "Livraison"];
+
 const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
 const selectedCategoryLabel =
@@ -179,6 +181,28 @@ const selectedCategoryLabel =
         }}
       />
       
+</div>
+<div className="ml-17.5 flex flex-wrap gap-2" aria-label="Raisons de visite rapides">
+  {visitReasonQuickOptions.map((reason) => (
+    <button
+      key={reason}
+      type="button"
+      aria-pressed={visitReason === reason}
+      onClick={() => {
+        setVisitReason(reason);
+        if (visitReasonError) {
+          setVisitReasonError(false);
+        }
+      }}
+      className={`rounded-lg border-2 border-secondary cursor-pointer px-4 py-2 text-[1.1em] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-secondary/30 ${
+        visitReason === reason
+          ? "bg-secondary text-white"
+          : "bg-white text-secondary hover:bg-[#f4f6ee]"
+      }`}
+    >
+      {reason}
+    </button>
+  ))}
 </div>
 </div>
 {visitReasonError && <FieldError id="visit-reason-error">La raison de la visite est requise.</FieldError>}
