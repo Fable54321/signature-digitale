@@ -46,6 +46,15 @@ const [visitReasonError, setVisitReasonError] = useState(false);
 const [visitorCategoryError, setVisitorCategoryError] = useState(false);
 const [hasEmailError, setHasEmailError] = useState(false);
 
+useEffect(() => {
+  const normalizedVisitReason = visitReason.trim().toLocaleLowerCase("fr-CA");
+
+  if (["pick-up", "pickup", "livraison"].includes(normalizedVisitReason)) {
+    setVisitorCategory("transporteur-livreur");
+    setVisitorCategoryError(false);
+  }
+}, [visitReason, setVisitorCategory]);
+
 const inputClassName = "mx-auto bg-white w-[97%] border-2 py-2 pl-2 border-secondary mt-2 rounded-lg text-[1.6em] focus:outline-none focus:ring-2 focus:ring-secondary/30";
 const inputErrorClassName = "border-red-500 bg-red-50 focus:ring-red-200";
 const errorClassName = "flex items-center gap-2 text-red-600 text-[0.95em] font-medium";
