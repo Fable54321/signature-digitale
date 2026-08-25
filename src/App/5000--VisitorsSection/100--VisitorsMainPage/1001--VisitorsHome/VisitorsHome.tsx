@@ -1,9 +1,19 @@
 import { Link } from "react-router-dom"
 import { ArrowRight, LogIn, LogOut } from "lucide-react"
 import vegibecLogo from '../../../../assets/vegibec.png'
+import { useLanguage } from "../../Contexts/VisitorsContext/LanguageContext";
+
+
+
 
 
 const VisitorsHome = () => {
+
+const { language } = useLanguage();
+
+
+
+
   return (
     <section className="relative flex flex-col items-center gap-10 w-[min(98%,800px)] ">
         <img src={vegibecLogo} alt="Vegibec Logo" className=' w-80 mt-10 tablet:w-150' />
@@ -13,7 +23,9 @@ const VisitorsHome = () => {
           <span className="flex h-[1.2em] w-[1.2em] items-center justify-center rounded-full bg-tertiary p-3 text-secondary">
             <LogIn className="h-full w-full" strokeWidth={2.5} />
           </span>
-          J'arrive
+          {language === 'fr' && "J'arrive"}
+          {language === 'en' && "I arrive"}
+          {language === 'es' && "Llego"}
         </span>
         <ArrowRight className="h-[0.8em] w-[0.8em]" strokeWidth={2.5} />
       </Link>
@@ -22,7 +34,9 @@ const VisitorsHome = () => {
           <span className="flex h-[1.2em] w-[1.2em] items-center justify-center rounded-full bg-tertiary p-3 text-secondary">
             <LogOut className="h-full w-full" strokeWidth={2.5} />
           </span>
-          Je quitte
+          {language === 'fr' && "Je quitte"}
+          {language === 'en' && "I'm leaving"}
+          {language === 'es' && "Salgo"}
         </span>
         <ArrowRight className="h-[0.8em] w-[0.8em]" strokeWidth={2.5} />
       </Link>
