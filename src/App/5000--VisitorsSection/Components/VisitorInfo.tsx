@@ -4,6 +4,7 @@ import QRGenerator from "./QRGenerator";
 import { AlertCircle, BriefcaseBusiness, CalendarDays, Clock4, ContactRound, NotepadText, Send, UserRound } from "lucide-react";
 import { scrollToBottom } from "../../../Utils/scrollToBottom";
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "../Contexts/VisitorsContext/LanguageContext";
 
 type Props = {
     fullName: string;
@@ -38,6 +39,7 @@ const VisitorInfo = ({ fullName,
     visitorCategory,
     setVisitorCategory,
  }: Props) => {
+const { language, text } = useLanguage();
 
 
 
@@ -47,9 +49,9 @@ const [visitorCategoryError, setVisitorCategoryError] = useState(false);
 const [hasEmailError, setHasEmailError] = useState(false);
 
 useEffect(() => {
-  const normalizedVisitReason = visitReason.trim().toLocaleLowerCase("fr-CA");
+  const normalizedVisitReason = visitReason.trim().toLocaleLowerCase();
 
-  if (["pick-up", "pickup", "livraison"].includes(normalizedVisitReason)) {
+  if (["pick-up", "pickup", "ramassage", "livraison", "delivery", "recogida", "entrega"].includes(normalizedVisitReason)) {
     setVisitorCategory("transporteur-livreur");
     setVisitorCategoryError(false);
   }
@@ -105,14 +107,14 @@ const isQrVisbile = useMemo(() => {
       },[isQrVisbile])
 
 const visitorCategoryOptions = [
-  { value: "gouvernement", label: "Travailleur du gouvernement" },
-  { value: "client", label: "Client" },
-  { value: "fournisseur", label: "Fournisseur" },
-  { value: "transporteur-livreur", label: "Transporteur/livreur" },
-  { value: "autre", label: "Autre" },
+  { value: "gouvernement", label: text.governmentWorker },
+  { value: "client", label: text.client },
+  { value: "fournisseur", label: text.supplier },
+  { value: "transporteur-livreur", label: text.carrier },
+  { value: "autre", label: text.other },
 ];
 
-const visitReasonQuickOptions = ["Pick-up", "Livraison"];
+const visitReasonQuickOptions = [text.pickup, text.delivery];
 
 const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
@@ -134,7 +136,7 @@ const selectedCategoryLabel =
       <input
         className={`${inputClassName} ${nameError ? inputErrorClassName : ""}`}
         type="text"
-        placeholder="Nom complet"
+        placeholder={text.fullName}
         value={fullName}
         aria-invalid={nameError}
         aria-describedby={nameError ? "visitor-name-error" : undefined}
@@ -147,7 +149,7 @@ const selectedCategoryLabel =
       />
       
 </div>
-{nameError && <FieldError id="visitor-name-error">Le nom complet est requis.</FieldError>}
+{nameError && <FieldError id="visitor-name-error">{text.fullNameRequired}</FieldError>}
 </div>
 <div className="flex items-center gap-5">
 
@@ -158,7 +160,7 @@ const selectedCategoryLabel =
       <input
         className={inputClassName}
         type="text"
-        placeholder="Nom de l'entreprise (si applicable)"
+        placeholder={text.companyName}
         value={companyName}
         onChange={(e) => setCompanyName(e.target.value)}
       />
@@ -179,7 +181,7 @@ const selectedCategoryLabel =
       <input
         className={`${inputClassName} ${visitReasonError ? inputErrorClassName : ""}`}
         type="text"
-        placeholder="Raison de la visite"
+        placeholder={text.visitReason}
         value={visitReason}
         aria-invalid={visitReasonError}
         aria-describedby={visitReasonError ? "visit-reason-error" : undefined}
@@ -192,7 +194,7 @@ const selectedCategoryLabel =
       />
       
 </div>
-<div className="ml-17.5 flex flex-wrap gap-2" aria-label="Raisons de visite rapides">
+<div className="ml-17.5 flex flex-wrap gap-2" aria-label={text.quickReasonsLabel}>
   {visitReasonQuickOptions.map((reason) => (
     <button
       key={reason}
@@ -215,9 +217,9 @@ const selectedCategoryLabel =
   ))}
 </div>
 </div>
-{visitReasonError && <FieldError id="visit-reason-error">La raison de la visite est requise.</FieldError>}
+{visitReasonError && <FieldError id="visit-reason-error">{text.visitReasonRequired}</FieldError>}
 <label htmlFor="visitorCategory" className="w-full flex flex-col border-b-2 border-[#e5ebd5] pb-7 border-dashed">
-      <span className="ml-4 text-secondary font-medium">  Quelle catégorie de visiteur s'applique à vous ? </span>
+      <span className="ml-4 text-secondary font-medium">{text.categoryQuestion}</span>
 
 <div className="flex items-center w-full gap-5 mt-2">
 
@@ -236,7 +238,7 @@ const selectedCategoryLabel =
     aria-invalid={visitorCategoryError}
     aria-describedby={visitorCategoryError ? "visitor-category-error" : undefined}
   >
-    {selectedCategoryLabel || "Sélectionnez une catégorie"}
+    {selectedCategoryLabel || text.selectCategory}
     <span className="absolute right-4 top-1/2 -translate-y-1/2">▾</span>
   </button>
 
@@ -270,15 +272,15 @@ const selectedCategoryLabel =
     </div>
     
       </label>
-{visitorCategoryError && <FieldError id="visitor-category-error">La cat&eacute;gorie de visiteur est requise.</FieldError>}
+{visitorCategoryError && <FieldError id="visitor-category-error">{text.categoryRequired}</FieldError>}
 <div className="mt-2 relative flex  justify-between items-center  py-3.5  bg-[#f4f6ee] rounded-xl ">
   <div className="flex items-center gap-5 pl-15">
     <div className="bg-[#e5ebd5] p-2 rounded-xl">
       <CalendarDays className="w-full text-secondary" size={50} />
     </div>
   <div className="flex flex-col">
-    <div className=" text-[0.9em]"><p>Visite en date du :</p> </div>
-    <p className="text-[1.5em]">{currentDate.toISOString().slice(0, 10)}</p>
+    <div className=" text-[0.9em]"><p>{text.visitDate}</p> </div>
+    <p className="text-[1.5em]">{currentDate.toLocaleDateString(language === "fr" ? "fr-CA" : language)}</p>
   </div>
   </div>
   <div className="flex items-center gap-5 pr-15">
@@ -286,8 +288,8 @@ const selectedCategoryLabel =
       <Clock4 className="w-full text-secondary" size={50} />
     </div>
   <div className="flex flex-col">
-    <div className=" text-[0.9em]"><p>Heure actuelle : </p></div>
-    <p className="text-[1.5em]">{currentDate.toLocaleTimeString()}</p>
+    <div className=" text-[0.9em]"><p>{text.currentTime}</p></div>
+    <p className="text-[1.5em]">{currentDate.toLocaleTimeString(language === "fr" ? "fr-CA" : language)}</p>
   </div>
   </div>
   <div className="absolute h-[85%]  w-0.5 bg-[#e5ebd5] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
@@ -303,7 +305,7 @@ const selectedCategoryLabel =
     
     
     <div className="bg-[#e5ebd5] px-3 py-3 my-6 rounded-xl">
-      <p className="w-full px-2 py-1 text-secondary font-medium bg-tertiary rounded-xl text-[1.3em]">Le plan du site est disponible via le code QR ci-dessus, mais il est recommandé d'entrer votre adresse courriel pour avoir une copie de l'url</p>
+      <p className="w-full px-2 py-1 text-secondary font-medium bg-tertiary rounded-xl text-[1.3em]">{text.planHelp}</p>
       </div>
           
             
@@ -319,7 +321,7 @@ const selectedCategoryLabel =
           className={`${inputClassName} ${hasEmailError ? inputErrorClassName : ""}`}
           type="email"
           inputMode="email"
-          placeholder="laissez vide pour ne pas recevoir de courriel"
+          placeholder={text.emailPlaceholder}
           value={email}
           aria-invalid={hasEmailError}
           aria-describedby={hasEmailError ? "email-error" : undefined}
@@ -333,14 +335,14 @@ const selectedCategoryLabel =
         </div>
        </label>
 
-            <p className=" text-[0.8em] ">(Vegibec inc. ne conservera pas votre addresse courriel.)</p>
+            <p className=" text-[0.8em] ">({text.emailPrivacy})</p>
       </div>  }
-      {hasEmailError && <FieldError id="email-error">Veuillez entrer une adresse courriel valide ou laisser le champ vide.</FieldError>}        
+      {hasEmailError && <FieldError id="email-error">{text.emailInvalid}</FieldError>}        
       
       
       
 
-      <button type="submit" className="button-generic text-[2.5em]">Suivant</button>
+      <button type="submit" className="button-generic text-[2.5em]">{text.next}</button>
       
     </form>
   )

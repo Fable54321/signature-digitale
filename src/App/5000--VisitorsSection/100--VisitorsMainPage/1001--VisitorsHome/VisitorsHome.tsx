@@ -9,7 +9,7 @@ import { useLanguage } from "../../Contexts/VisitorsContext/LanguageContext";
 
 const VisitorsHome = () => {
 
-const { language } = useLanguage();
+const { text } = useLanguage();
 
 
 
@@ -23,9 +23,7 @@ const { language } = useLanguage();
           <span className="flex h-[1.2em] w-[1.2em] items-center justify-center rounded-full bg-tertiary p-3 text-secondary">
             <LogIn className="h-full w-full" strokeWidth={2.5} />
           </span>
-          {language === 'fr' && "J'arrive"}
-          {language === 'en' && "I arrive"}
-          {language === 'es' && "Llego"}
+          {text.arrival}
         </span>
         <ArrowRight className="h-[0.8em] w-[0.8em]" strokeWidth={2.5} />
       </Link>
@@ -34,9 +32,7 @@ const { language } = useLanguage();
           <span className="flex h-[1.2em] w-[1.2em] items-center justify-center rounded-full bg-tertiary p-3 text-secondary">
             <LogOut className="h-full w-full" strokeWidth={2.5} />
           </span>
-          {language === 'fr' && "Je quitte"}
-          {language === 'en' && "I'm leaving"}
-          {language === 'es' && "Salgo"}
+          {text.departure}
         </span>
         <ArrowRight className="h-[0.8em] w-[0.8em]" strokeWidth={2.5} />
       </Link>

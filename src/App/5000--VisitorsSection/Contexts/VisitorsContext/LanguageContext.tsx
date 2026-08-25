@@ -5,19 +5,24 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { visitorTranslations, type VisitorTranslations } from "./VisitorTranslations";
 
 export type VisitorLanguage = "fr" | "es" | "en";
 
 type LanguageContextValue = {
   language: VisitorLanguage;
   setLanguage: (language: VisitorLanguage) => void;
+  text: VisitorTranslations;
 };
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<VisitorLanguage>("fr");
-  const value = useMemo(() => ({ language, setLanguage }), [language]);
+  const value = useMemo(
+    () => ({ language, setLanguage, text: visitorTranslations[language] }),
+    [language],
+  );
 
   return (
     <LanguageContext.Provider value={value}>

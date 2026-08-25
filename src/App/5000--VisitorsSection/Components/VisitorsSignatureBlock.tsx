@@ -1,11 +1,13 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
+import { useLanguage } from "../Contexts/VisitorsContext/LanguageContext";
 
 type Props = {
   onValidate: (signatureDataUrl: string) => Promise<void> | void;
 };
 
 const VisitorsSignatureBlock = ({ onValidate }: Props) => {
+  const { text } = useLanguage();
   const sigCanvas = useRef<SignatureCanvas | null>(null);
   const canvasContainer = useRef<HTMLDivElement | null>(null);
 
@@ -68,7 +70,7 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
     
      {signatureError && (
         <p className="text-red-500 text-center mt-2">
-          Veuillez fournir votre signature pour continuer.
+          {text.signatureRequired}
         </p>
       )}
 
@@ -80,7 +82,7 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
           type="button"
           className="button-generic text-[1.5em] flex-1"
         >
-          Confirmer
+          {text.confirm}
         </button>
 
         <button
@@ -88,7 +90,7 @@ const VisitorsSignatureBlock = ({ onValidate }: Props) => {
           type="button"
           className="text-[1.5em] button-generic-red flex-1"
         >
-          Effacer
+          {text.clear}
         </button>
       </div>
      

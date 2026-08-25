@@ -5,8 +5,10 @@ import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import { scrollToBottom } from "../../../../Utils/scrollToBottom";
 import { CircleX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../Contexts/VisitorsContext/LanguageContext";
 
 const DeparturePage = () => {
+  const { language, text } = useLanguage();
   const {
     fetchActiveVisits,
     activeVisits,
@@ -77,7 +79,7 @@ const DeparturePage = () => {
       text-secondary
       font-secondary font-bold gap-2 w-[60%] justify-center "
       >
-        <p>Je :</p>
+        <p>{text.iAm}</p>
         <div className="relative w-[60%]">
           <button
             type="button"
@@ -97,8 +99,8 @@ const DeparturePage = () => {
           >
             {selectedVisit?.full_name ||
               (activeVisits.length > 0
-                ? "Sélectionnez votre nom"
-                : "Aucun visiteur actif")}
+                ? text.selectName
+                : text.noActiveVisitor)}
             <span className="absolute right-4 top-1/2 -translate-y-1/2">▼</span>
           </button>
 
@@ -128,12 +130,12 @@ const DeparturePage = () => {
 
       {activeVisitsLoading && <Spinner />}
       {activeVisitsError && (
-        <p className="text-red-500 text-center text-[1.2em]">{activeVisitsError}</p>
+        <p className="text-red-500 text-center text-[1.2em]">{text.activeVisitsError}</p>
       )}
 
       <div className="flex flex-col items-center p-3 bg-white rounded-lg">
-        <p className="text-[2em] mt-5 font-secondary">Confirme avoir quitté à :</p>
-        <p className="text-[3em] font-bold">{currentTime.toLocaleTimeString()}</p>
+        <p className="text-[2em] mt-5 font-secondary">{text.confirmDeparture}</p>
+        <p className="text-[3em] font-bold">{currentTime.toLocaleTimeString(language === "fr" ? "fr-CA" : language)}</p>
       </div>
 
       {selectedVisit && (

@@ -7,6 +7,7 @@ import { useVisitors } from "../../Contexts/VisitorsContext/UseVisitors";
 import VisitorInfo from "../../Components/VisitorInfo";
 import Spinner from "../../../../Components/Spinner";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../Contexts/VisitorsContext/LanguageContext";
 
 
 
@@ -18,6 +19,7 @@ type ChecklistState = Record<ChecklistKey, boolean>;
 
 
 const ChecklistBox = () => {
+    const { text } = useLanguage();
 
  
     const [checklist, setChecklist] = useState<ChecklistState>({
@@ -164,7 +166,7 @@ if(startVisitorSessionLoading){
         <h2 className="w-full text-[1.8em] font-primary text-secondary font-bold  pb-2 pt-2  border-primary">
           
           {
-        isInfoCompleted ? "Politique pour les visiteurs" : "Informations du visiteur" 
+        isInfoCompleted ? text.visitorPolicy : text.visitorInformation
        
         }</h2>
       </div>
@@ -190,14 +192,14 @@ if(startVisitorSessionLoading){
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.3em] mt-2">
           <div className="flex flex-col items-center gap-0">
-          <p className="text-center text-[1.2em] font-bold text-secondary ">J'accepte les conditions suivantes :</p>
-          <p>(cochez les cases sur la droite)</p>
+          <p className="text-center text-[1.2em] font-bold text-secondary ">{text.acceptConditions}</p>
+          <p>{text.checkBoxes}</p>
           </div>
-          {isAllcheckedError && <p className="text-red-500 text-center text-[1em]">Veuillez accepter toutes les conditions pour continuer.</p>}
+          {isAllcheckedError && <p className="text-red-500 text-center text-[1em]">{text.acceptAllError}</p>}
         {(Object.entries(checklist) as Array<[ChecklistKey, boolean]>).map(([key, value]) => (
           <div key={key} className="relative flex items-center  pt-1 text-secondary  ">
             
-            <p className="text-[1.3em] mr-6 pb-3 border-b-3  border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{rules[key]}</p>
+            <p className="text-[1.3em] mr-6 pb-3 border-b-3  border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{text.rules[key]}</p>
 
             <label className={`mr-0 ml-auto w-20 h-20 rounded-xl   border  border-secondary border-b-3 border-t border-l hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-${key}`}>
               {value && <Check className="text-secondary" size={50} />}
@@ -220,7 +222,7 @@ if(startVisitorSessionLoading){
         ))}
         <div className="w-full flex items-center gap-3">
         <label className="flex flex-col items-center gap-2 w-full text-[1.3em] text-secondary font-bold">
-          Autre (précisez): 
+          {text.otherSpecify}
           <textarea value={otherContent} onChange={(e) => setOtherContent(e.target.value)}  className="bg-tertiary p-2 border-t-0 border-r-0  flex-1 w-full text-[1em]  border-b-3 border-primary border-l focus:outline-none focus-within:outline-none  rounded-b-lg focus:border-primary shadow-[0_4px_6px_rgba(0,0,0,0.1)]" rows={5}  />
         </label>
           <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border   border-secondary border-b-3 border-t border-l hover:cursor-pointer flex justify-center items-center bg-tertiary `} htmlFor={`rule-other`}>
@@ -237,7 +239,7 @@ if(startVisitorSessionLoading){
             />
         </div>
         <div className="flex flex-col gap-2 items-center py-3">
-<p className="text-center text-[1.3em]">J'ai pris conscience et je comprends la politique <span>(cochez la case, puis signer dans l'espace à cet effet)</span></p>
+<p className="text-center text-[1.3em]">{text.policyAcknowledgement} <span>{text.policyAcknowledgementHint}</span></p>
   <label className={` w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-secondary border-b-3 border-t-0 border-l-0 hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-accept`}>
               {isUnderstandingChecked && <Check  className="text-secondary " size={50}   />}
             </label>
