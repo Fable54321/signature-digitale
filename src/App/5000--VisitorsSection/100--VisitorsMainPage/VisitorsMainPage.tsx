@@ -29,7 +29,7 @@ if (sessionSubmissionSuccess) {
   return (
     <>
 
-    <div className="relative w-full flex justify-between px-4 top-5 mb-3">
+    <div className="relative w-full flex justify-between px-4 top-5 mb-3 z-50">
       {languages
         .filter(({ code }) => code !== language)
         .map(({ code, label }) => (
