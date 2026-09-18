@@ -64,6 +64,35 @@ useEffect(() => {
       return Object.values(checklist).every((value) => value);
     }, [checklist]);
 
+    const handleChecklistChange = (key: ChecklistKey, checked: boolean) => {
+      const nextChecklist = {
+        ...checklist,
+        [key]: checked,
+      };
+
+      setChecklist(nextChecklist);
+
+      if (!checked) {
+        setIsUnderstandingChecked(false);
+      }
+
+      if (Object.values(nextChecklist).every((value) => value)) {
+        setIsAllCheckedError(false);
+      }
+    };
+
+    const handleUnderstandingChange = (checked: boolean) => {
+      if (checked && !isAllChecked) {
+        setIsUnderstandingChecked(false);
+        setIsAllCheckedError(true);
+        scrollToTop();
+        return;
+      }
+
+      setIsAllCheckedError(false);
+      setIsUnderstandingChecked(checked);
+    };
+
     const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
     useEffect(()=> { console.log(isAllChecked) },[isAllChecked, checklist])
@@ -191,33 +220,43 @@ if(startVisitorSessionLoading){
          <form action="" className="px-4">
          
         {isInfoCompleted && <div className="flex flex-col gap-4 text-[1.3em] mt-2">
-          <div className="flex flex-col items-center gap-0">
-          <p className="text-center text-[1.2em] font-bold text-secondary ">{text.acceptConditions}</p>
-          <p>{text.checkBoxes}</p>
+          <div className="flex flex-col items-center gap-2">
+          <p className="text-center text-[1.3em] font-bold text-secondary ">{text.acceptConditions}</p>
+          <div className="flex items-center justify-center gap-3 rounded-lg border-2 border-secondary bg-tertiary px-4 py-2 text-center font-semibold text-secondary">
+            <span aria-hidden="true" className="flex h-7 w-7 shrink-0 items-center justify-center rounded border-2 border-secondary bg-white">
+              <Check size={20} strokeWidth={3} />
+            </span>
+            <p>{text.checkBoxes}</p>
+          </div>
           </div>
           {isAllcheckedError && <p className="text-red-500 text-center text-[1em]">{text.acceptAllError}</p>}
         {(Object.entries(checklist) as Array<[ChecklistKey, boolean]>).map(([key, value]) => (
-          <div key={key} className="relative flex items-center  pt-1 text-secondary  ">
-            
-            <p className="text-[1.3em] mr-6 pb-3 border-b-3  border-secondary border-l pl-10 rounded-b-xl shadow-lg w-full bg-tertiary" >{text.rules[key]}</p>
-
-            <label className={`mr-0 ml-auto w-20 h-20 rounded-xl   border  border-secondary border-b-3 border-t border-l hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-${key}`}>
-              {value && <Check className="text-secondary" size={50} />}
-            </label>
+          <label key={key} className="group relative flex cursor-pointer items-stretch gap-3 pt-1 text-black" htmlFor={`rule-${key}`}>
             <input
-            id={`rule-${key}`}
+              id={`rule-${key}`}
               type="checkbox"
               checked={value}
               onChange={(e) => {
-                setChecklist((prev) => ({
-                  ...prev,
-                  [key]: e.target.checked,
-                }));
+                handleChecklistChange(key, e.target.checked);
               }}
-              className="hidden"
+              className="peer sr-only"
             />
-            
-          </div>
+            <span className="w-full rounded-b-xl border-b-3 border-l border-secondary bg-tertiary py-3 pl-6 pr-3 text-[1.3em] shadow-lg transition-colors group-hover:bg-secondary/10 peer-focus-visible:ring-4 peer-focus-visible:ring-secondary/30">
+              {text.rules[key]}
+            </span>
+            <span
+              aria-hidden="true"
+              className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border-2 border-secondary shadow-md transition-all group-hover:scale-105 peer-focus-visible:ring-4 peer-focus-visible:ring-secondary/30 ${
+                value ? "bg-secondary text-white" : "bg-white text-secondary"
+              }`}
+            >
+              {value ? (
+                <Check size={52} strokeWidth={3} />
+              ) : (
+                <span className="px-1 text-center text-sm font-bold leading-tight">{text.checkBoxPrompt}</span>
+              )}
+            </span>
+          </label>
           
         ))}
         <div className="w-full flex items-center gap-3">
@@ -225,8 +264,8 @@ if(startVisitorSessionLoading){
           {text.otherSpecify}
           <textarea value={otherContent} onChange={(e) => setOtherContent(e.target.value)}  className="bg-tertiary p-2 border-t-0 border-r-0  flex-1 w-full text-[1em]  border-b-3 border-primary border-l focus:outline-none focus-within:outline-none  rounded-b-lg focus:border-primary shadow-[0_4px_6px_rgba(0,0,0,0.1)]" rows={5}  />
         </label>
-          <label className={`mr-0 ml-auto w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border   border-secondary border-b-3 border-t border-l hover:cursor-pointer flex justify-center items-center bg-tertiary `} htmlFor={`rule-other`}>
-              {<Check className= {`text-secondary ${isOtherChecked ? " " : "hidden"}`} size={50}   />}
+          <label className={`mr-0 ml-auto flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 border-secondary shadow-md transition-all hover:scale-105 ${isOtherChecked ? "bg-secondary text-white" : "bg-white text-secondary"}`} htmlFor={`rule-other`}>
+              {isOtherChecked ? <Check size={52} strokeWidth={3} /> : <span className="px-1 text-center text-sm font-bold leading-tight">{text.checkBoxPrompt}</span>}
             </label>
             <input
             id={`rule-other`}
@@ -235,24 +274,24 @@ if(startVisitorSessionLoading){
               onChange={(e) => {
                 setIsOtherChecked(e.target.checked);
               }}
-              className="hidden"
+              className="sr-only"
             />
         </div>
-        <div className="flex flex-col gap-2 items-center py-3">
+        <label className="flex cursor-pointer flex-col items-center gap-3 rounded-xl py-3 transition-colors hover:bg-secondary/5" htmlFor={`rule-accept`}>
 <p className="text-center text-[1.3em]">{text.policyAcknowledgement} <span>{text.policyAcknowledgementHint}</span></p>
-  <label className={` w-20 h-20 rounded-xl  shadow-[0_4px_6px_rgba(0,0,0,0.1)] border border-secondary border-b-3 border-t-0 border-l-0 hover:cursor-pointer flex justify-center items-center bg-tertiary`} htmlFor={`rule-accept`}>
-              {isUnderstandingChecked && <Check  className="text-secondary " size={50}   />}
-            </label>
+  <span aria-hidden="true" className={`flex h-20 w-20 items-center justify-center rounded-xl border-2 border-secondary shadow-md transition-all hover:scale-105 ${isUnderstandingChecked ? "bg-secondary text-white" : "bg-white text-secondary"}`}>
+              {isUnderstandingChecked ? <Check size={52} strokeWidth={3} /> : <span className="px-1 text-center text-sm font-bold leading-tight">{text.checkBoxPrompt}</span>}
+            </span>
             <input
             id={`rule-accept`}
               type="checkbox"
               checked={isUnderstandingChecked}
               onChange={(e) => {
-                setIsUnderstandingChecked(e.target.checked);
+                handleUnderstandingChange(e.target.checked);
               }}
-              className="hidden"
+              className="sr-only"
             />
-</div>
+</label>
 {isUnderstandingChecked && <VisitorsSignatureBlock onValidate={handleSubmit} />}
 </div>}
 
